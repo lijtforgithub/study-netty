@@ -1,6 +1,6 @@
-package com.ljt.study.netty.wrap;
+package com.ljt.study.netty.helloword;
 
-import com.ljt.study.netty.TimeServer;
+import com.ljt.study.netty.Server;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerAdapter;
@@ -8,6 +8,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -18,10 +19,10 @@ import static com.ljt.study.Constant.*;
  * @author LiJingTang
  * @date 2020-05-08 09:47
  */
-public class ErrorServer {
+public class TcpServer {
 
     public static void main(String[] args) {
-        new TimeServer(new ChannelInitializer<SocketChannel>() {
+        new Server(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) {
                 socketChannel.pipeline().addLast(new TimeServerHandler());
@@ -44,19 +45,14 @@ public class ErrorServer {
 
             String currentTime = TIMER_ORDER.equalsIgnoreCase(body) ? LocalDateTime.now().toString() : TIMER_BAD;
             ByteBuf resp = Unpooled.copiedBuffer(currentTime.getBytes());
-            ctx.write(resp);
-        }
-
-        @Override
-        public void channelReadComplete(ChannelHandlerContext ctx) {
-            ctx.flush();
+            ctx.writeAndFlush(resp);
         }
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+            log.error(StringUtils.EMPTY, cause);
             ctx.close();
         }
-
     }
 
 }

@@ -17,4 +17,6 @@ public class Constant {
     public static final String TIMER_ORDER = "QUERY TIME ORDER";
     public static final String TIMER_BAD = "BAD ORDER";
 
+    public static final String DELIMITER = "$_";
+
 }

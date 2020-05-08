@@ -1,6 +1,6 @@
-package com.ljt.study.netty.wrap;
+package com.ljt.study.netty.decoder;
 
-import com.ljt.study.netty.TimeClient;
+import com.ljt.study.netty.Client;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerAdapter;
@@ -19,10 +19,10 @@ import static com.ljt.study.Constant.TIMER_ORDER;
  * @author LiJingTang
  * @date 2020-04-30 17:12
  */
-public class WrapClient {
+public class LineBasedClient {
 
     public static void main(String[] args) {
-        new TimeClient(new ChannelInitializer<SocketChannel>() {
+        new Client(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) {
                 socketChannel.pipeline()
@@ -44,11 +44,6 @@ public class WrapClient {
         }
 
         @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-            log.error(StringUtils.EMPTY, cause);
-        }
-
-        @Override
         public void channelActive(ChannelHandlerContext ctx) {
             for (int i = 0; i < 100; i++) {
                 ByteBuf message = Unpooled.buffer(req.length);
@@ -61,6 +56,12 @@ public class WrapClient {
         public void channelRead(ChannelHandlerContext ctx, Object msg) {
             String body = (String) msg;
             log.info("客户端接收到数据：{}；counter={}", body, ++counter);
+        }
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+            log.error(StringUtils.EMPTY, cause);
+            ctx.close();
         }
     }
 
