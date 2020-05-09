@@ -45,7 +45,7 @@ public class Client {
 
             // 发起异步连接操作
             ChannelFuture future = bootstrap.connect(host, port).sync();
-            log.info("客户端启动成功");
+            log.info("客户端启动成功 {} {}", host, port);
             // 等待客户端链路关闭
             future.channel().closeFuture().sync();
             log.info("客户端关闭");

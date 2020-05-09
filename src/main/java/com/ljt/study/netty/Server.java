@@ -39,10 +39,11 @@ public class Server {
             bootstrap.group(bossGroup, workGroup)
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 1024)
+//                    .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(channelHandler);
             // 绑定端口 同步等待成功
             ChannelFuture future = bootstrap.bind(port).sync();
-            log.info("服务端启动成功");
+            log.info("服务端启动成功 {}", port);
             // 等待服务端口监听端口关闭
             future.channel().closeFuture().sync();
             log.info("服务端关闭");

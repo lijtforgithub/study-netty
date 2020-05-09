@@ -18,5 +18,6 @@ public class Constant {
     public static final String TIMER_BAD = "BAD ORDER";
 
     public static final String DELIMITER = "$_";
+    public static final String LIJT = "LiJingTang";
 
 }
