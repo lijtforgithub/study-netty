@@ -23,7 +23,7 @@ import static io.netty.util.CharsetUtil.UTF_8;
  * @date 2020-05-09 16:07
  */
 @Slf4j
-public class UDPServer {
+public class UdpServer {
 
     public static void main(String[] args) {
         EventLoopGroup group = new NioEventLoopGroup();

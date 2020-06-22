@@ -24,6 +24,6 @@ public class SubscribeResp implements Serializable {
     /**
      * 描述信息
      */
-    private  String desc;
+    private String desc;
 
 }

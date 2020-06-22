@@ -6,7 +6,8 @@ package com.ljt.study;
  */
 public class Constant {
 
-    private Constant() {}
+    private Constant() {
+    }
 
     public static final String LOCAL_HOST = "localhost";
     public static final int PORT = 8080;

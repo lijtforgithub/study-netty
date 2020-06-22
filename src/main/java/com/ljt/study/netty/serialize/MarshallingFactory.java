@@ -11,20 +11,33 @@ import org.jboss.marshalling.MarshallingConfiguration;
  */
 public final class MarshallingFactory {
 
+    private MarshallingFactory() {
+    }
+
     private static final String SERIAL = "serial";
 
-    public static MarshallingDecoder buildDecoder() {
+    public static UnmarshallerProvider getUnmarshallerProvider() {
         final MarshallerFactory factory = Marshalling.getProvidedMarshallerFactory(SERIAL);
+        return new DefaultUnmarshallerProvider(factory, getConfiguration());
+    }
+
+    public static MarshallerProvider getMarshallerProvider() {
+        final MarshallerFactory factory = Marshalling.getProvidedMarshallerFactory(SERIAL);
+        return new DefaultMarshallerProvider(factory, getConfiguration());
+    }
+
+    private static MarshallingConfiguration getConfiguration() {
         final MarshallingConfiguration configuration = new MarshallingConfiguration();
         configuration.setVersion(5);
-        return new MarshallingDecoder(new DefaultUnmarshallerProvider(factory, configuration), 1024);
+        return configuration;
+    }
+
+    public static MarshallingDecoder buildDecoder() {
+        return new MarshallingDecoder(getUnmarshallerProvider(), 1024);
     }
 
     public static MarshallingEncoder buildEncoder() {
-        final MarshallerFactory factory = Marshalling.getProvidedMarshallerFactory(SERIAL);
-        final MarshallingConfiguration configuration = new MarshallingConfiguration();
-        configuration.setVersion(5);
-        return new MarshallingEncoder(new DefaultMarshallerProvider(factory, configuration));
+        return new MarshallingEncoder(getMarshallerProvider());
     }
 
 }

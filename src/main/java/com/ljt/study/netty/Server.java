@@ -7,10 +7,13 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import static com.ljt.study.Constant.LOCAL_HOST;
 import static com.ljt.study.Constant.PORT;
 
 /**
@@ -22,10 +25,12 @@ import static com.ljt.study.Constant.PORT;
 public class Server {
 
     private int port;
+    private String host;
     private ChannelHandler channelHandler;
 
     public Server(ChannelHandler channelHandler) {
         this.port = PORT;
+        this.host = LOCAL_HOST;
         this.channelHandler = channelHandler;
     }
 
@@ -39,11 +44,11 @@ public class Server {
             bootstrap.group(bossGroup, workGroup)
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 1024)
-//                    .handler(new LoggingHandler(LogLevel.INFO))
+                    .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(channelHandler);
             // 绑定端口 同步等待成功
-            ChannelFuture future = bootstrap.bind(port).sync();
-            log.info("服务端启动成功 {}", port);
+            ChannelFuture future = bootstrap.bind(host, port).sync();
+            log.info("服务端启动成功 {}:{}", host, port);
             // 等待服务端口监听端口关闭
             future.channel().closeFuture().sync();
             log.info("服务端关闭");
