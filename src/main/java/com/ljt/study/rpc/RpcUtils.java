@@ -1,8 +1,8 @@
 package com.ljt.study.rpc;
 
 import com.ljt.study.rpc.protocol.CustomHeader;
-import com.ljt.study.rpc.protocol.CustomRequestBody;
-import com.ljt.study.rpc.protocol.CustomResponseBody;
+import com.ljt.study.rpc.protocol.RequestBody;
+import com.ljt.study.rpc.protocol.ResponseBody;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -20,6 +20,8 @@ import static com.ljt.study.Constant.LOCAL_HOST;
 public class RpcUtils {
 
     public static final InetSocketAddress ADDRESS = new InetSocketAddress(LOCAL_HOST, 9090);
+    public static final String HTTP_URL = "http://localhost:9090/";
+    public static final String PROTOCOL = "protocol";
 
     private RpcUtils() {
     }
@@ -53,12 +55,12 @@ public class RpcUtils {
         return (CustomHeader) unSerial(bytes);
     }
 
-    public static CustomRequestBody unSerialRequestBody(byte[] bytes) {
-        return (CustomRequestBody) unSerial(bytes);
+    public static RequestBody unSerialRequestBody(byte[] bytes) {
+        return (RequestBody) unSerial(bytes);
     }
 
-    public static CustomResponseBody unSerialResponseBody(byte[] bytes) {
-        return (CustomResponseBody) unSerial(bytes);
+    public static ResponseBody unSerialResponseBody(byte[] bytes) {
+        return (ResponseBody) unSerial(bytes);
     }
 
     public static CustomHeader createHeader(int contentLength) {
@@ -70,8 +72,8 @@ public class RpcUtils {
         return header;
     }
 
-    public static CustomRequestBody createRequestBody(Class<?> clazz, Method method, Object[] args) {
-        CustomRequestBody body = new CustomRequestBody();
+    public static RequestBody createRequestBody(Class<?> clazz, Method method, Object[] args) {
+        RequestBody body = new RequestBody();
         body.setTypeName(clazz.getName());
         body.setMethodName(method.getName());
         body.setParameterTypes(method.getParameterTypes());

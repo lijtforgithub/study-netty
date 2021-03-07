@@ -2,8 +2,8 @@ package com.ljt.study.rpc.handler;
 
 import com.ljt.study.rpc.protocol.CustomHeader;
 import com.ljt.study.rpc.protocol.CustomPackage;
-import com.ljt.study.rpc.protocol.CustomRequestBody;
-import com.ljt.study.rpc.protocol.CustomResponseBody;
+import com.ljt.study.rpc.protocol.RequestBody;
+import com.ljt.study.rpc.protocol.ResponseBody;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -40,10 +40,10 @@ public class CustomProtocolDecode extends ByteToMessageDecoder {
                 pck.setHeader(customHeader);
                 // 请求和响应都在用
                 if (customHeader.isRequest()) {
-                    CustomRequestBody requestBody = unSerialRequestBody(body);
+                    RequestBody requestBody = unSerialRequestBody(body);
                     pck.setRequestBody(requestBody);
                 } else {
-                    CustomResponseBody responseBody = unSerialResponseBody(body);
+                    ResponseBody responseBody = unSerialResponseBody(body);
                     pck.setResponseBody(responseBody);
                 }
                 out.add(pck);

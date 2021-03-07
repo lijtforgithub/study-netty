@@ -1,19 +1,28 @@
 package com.ljt.study.rpc;
 
+import com.ljt.study.rpc.protocol.ProtocolEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.ToString;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.ljt.study.rpc.RpcUtils.PROTOCOL;
 
 /**
  * @author LiJingTang
  * @date 2021-03-06 16:11
  */
 public class RpcTest {
+
+    @Before
+    public void setProtocol() {
+        System.setProperty(PROTOCOL, ProtocolEnum.BIO_HTTP.name());
+    }
 
     @Test
     public void startProvider() {

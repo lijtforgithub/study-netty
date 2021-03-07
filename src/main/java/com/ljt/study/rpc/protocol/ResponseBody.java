@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 @Setter
 @Getter
-public class CustomResponseBody implements Serializable {
+public class ResponseBody implements Serializable {
 
     private static final long serialVersionUID = 3081721586643533074L;
 

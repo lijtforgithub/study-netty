@@ -3,8 +3,8 @@ package com.ljt.study.rpc.handler;
 import com.ljt.study.rpc.Invoker;
 import com.ljt.study.rpc.protocol.CustomHeader;
 import com.ljt.study.rpc.protocol.CustomPackage;
-import com.ljt.study.rpc.protocol.CustomRequestBody;
-import com.ljt.study.rpc.protocol.CustomResponseBody;
+import com.ljt.study.rpc.protocol.RequestBody;
+import com.ljt.study.rpc.protocol.ResponseBody;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelHandlerAdapter;
@@ -40,10 +40,10 @@ public class CustomRequestHandler extends ChannelHandlerAdapter {
         executor.execute(() -> {
             log.debug("IO: {} 业务：{}", ioThread, Thread.currentThread().getName());
 
-            CustomRequestBody requestBody = pck.getRequestBody();
+            RequestBody requestBody = pck.getRequestBody();
             Object result = Invoker.invoke(requestBody.getTypeName(), requestBody.getMethodName(),
                     requestBody.getParameterTypes(), requestBody.getArgs());
-            CustomResponseBody responseBody = new CustomResponseBody();
+            ResponseBody responseBody = new ResponseBody();
             responseBody.setResult(result);
 
             final byte[] body = serial(responseBody);

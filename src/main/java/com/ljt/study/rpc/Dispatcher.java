@@ -18,7 +18,7 @@ public class Dispatcher {
 
     public static void register(Class<?> clazz, Object obj) {
         MAP.put(clazz, obj);
-        log.info("注册服务{} = {}", clazz, obj);
+        log.info("注册服务：{} = {}", clazz, obj);
     }
 
     public static Object get(Class<?> clazz) {

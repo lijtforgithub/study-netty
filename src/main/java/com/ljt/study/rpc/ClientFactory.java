@@ -1,9 +1,6 @@
 package com.ljt.study.rpc;
 
-import com.ljt.study.rpc.handler.CustomProtocolDecode;
-import com.ljt.study.rpc.handler.CustomResponseHandler;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -19,6 +16,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.ljt.study.rpc.protocol.ProtocolManage.getClientChannelInitializer;
 
 /**
  * @author LiJingTang
@@ -61,13 +60,7 @@ public class ClientFactory {
             bootstrap.group(GROUP)
                     .channel(NioSocketChannel.class)
                     .option(ChannelOption.TCP_NODELAY, true)
-                    .handler(new ChannelInitializer<NioSocketChannel>() {
-                        @Override
-                        protected void initChannel(NioSocketChannel ch) {
-                            ch.pipeline().addLast(new CustomProtocolDecode())
-                                    .addLast(new CustomResponseHandler());
-                        }
-                    });
+                    .handler(getClientChannelInitializer());
 
             SocketChannel channel = (SocketChannel) bootstrap.connect(socketAddress).sync().channel();
             log.info("客户端创建成功 {}", socketAddress);

@@ -16,7 +16,7 @@ public class CustomPackage implements Serializable {
     private static final long serialVersionUID = 2517265218072922583L;
 
     private CustomHeader header;
-    private CustomRequestBody requestBody;
-    private CustomResponseBody responseBody;
+    private RequestBody requestBody;
+    private ResponseBody responseBody;
 
 }

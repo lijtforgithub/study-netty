@@ -1,10 +1,7 @@
 package com.ljt.study.rpc;
 
-import com.ljt.study.rpc.protocol.CustomHeader;
-import com.ljt.study.rpc.protocol.CustomRequestBody;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.socket.SocketChannel;
+import com.ljt.study.rpc.protocol.ProtocolManage;
+import com.ljt.study.rpc.protocol.RequestBody;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
@@ -12,7 +9,7 @@ import java.lang.reflect.Proxy;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-import static com.ljt.study.rpc.RpcUtils.*;
+import static com.ljt.study.rpc.RpcUtils.createRequestBody;
 
 /**
  * @author LiJingTang
@@ -32,22 +29,12 @@ public class ProxyUtils {
             // 本地调用 同一个JVM
             final Object obj = Dispatcher.get(clazz);
             if (Objects.nonNull(obj)) {
-                log.info("LC: Local call");
+                log.debug("LC: Local Call");
                 return method.invoke(obj, args);
             } else {
-                log.info("RPC call");
-                CustomRequestBody requestBody = createRequestBody(clazz, method, args);
-                final byte[] body = RpcUtils.serial(requestBody);
-                CustomHeader customHeader = createHeader(body.length);
-                final byte[] header = serial(customHeader);
-
-                CompletableFuture<Object> future = new CompletableFuture<>();
-                ResponseCallback.add(customHeader.getRequestId(), future);
-
-                ByteBuf byteBuf = PooledByteBufAllocator.DEFAULT.directBuffer(header.length + body.length);
-                byteBuf.writeBytes(header).writeBytes(body);
-                SocketChannel client = ClientFactory.getClient(ADDRESS);
-                client.writeAndFlush(byteBuf);
+                log.debug("RPC: Remote Procedure Call");
+                RequestBody requestBody = createRequestBody(clazz, method, args);
+                CompletableFuture<Object> future = ProtocolManage.getTransporter().transport(requestBody);
 
                 return future.get();
             }
@@ -55,6 +42,5 @@ public class ProxyUtils {
 
         return result;
     }
-
 
 }
