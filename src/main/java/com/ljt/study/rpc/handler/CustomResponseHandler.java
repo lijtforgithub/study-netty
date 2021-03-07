@@ -1,6 +1,6 @@
 package com.ljt.study.rpc.handler;
 
-import com.ljt.study.rpc.ResponseCallback;
+import com.ljt.study.rpc.CustomProtocolCallback;
 import com.ljt.study.rpc.protocol.CustomPackage;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,8 +13,9 @@ public class CustomResponseHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        // 已在CustomProtocolDecode里处理成此对象
         CustomPackage pck = (CustomPackage) msg;
-        ResponseCallback.call(pck);
+        CustomProtocolCallback.call(pck);
     }
 
 }

@@ -18,6 +18,8 @@ import static com.ljt.study.rpc.RpcUtils.PROTOCOL;
 import static com.ljt.study.rpc.protocol.ProtocolEnum.CUSTOM_RPC;
 
 /**
+ * 协议不同使用的发送/接收策略不同
+ *
  * @author LiJingTang
  * @date 2021-03-07 13:18
  */
@@ -62,7 +64,6 @@ public class ProtocolManage {
                 serverChannelInitializer = new ChannelInitializer<NioSocketChannel>() {
                     @Override
                     protected void initChannel(NioSocketChannel ch) {
-                        log.info("客户端接入：{}", ch.remoteAddress().getPort());
                         ch.pipeline().addLast(new HttpServerCodec())
                                 .addLast(new HttpObjectAggregator(MAX_CONTENT_LENGTH))
                                 .addLast(new HttpRequestHandler());
@@ -74,7 +75,6 @@ public class ProtocolManage {
                 serverChannelInitializer = new ChannelInitializer<NioSocketChannel>() {
                     @Override
                     protected void initChannel(NioSocketChannel ch) {
-                        log.info("客户端接入：{}", ch.remoteAddress().getPort());
                         ch.pipeline().addLast(new HttpServerCodec())
                                 .addLast(new HttpObjectAggregator(MAX_CONTENT_LENGTH))
                                 .addLast(new HttpRequestHandler());

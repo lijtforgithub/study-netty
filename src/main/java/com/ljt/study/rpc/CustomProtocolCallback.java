@@ -10,9 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author LiJingTang
  * @date 2021-03-06 16:32
  */
-public class ResponseCallback {
+public class CustomProtocolCallback {
 
-    private ResponseCallback() {
+    private CustomProtocolCallback() {
     }
 
     private static final Map<Long, CompletableFuture<Object>> MAP = new ConcurrentHashMap<>();

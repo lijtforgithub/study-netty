@@ -1,4 +1,4 @@
-package com.ljt.study.rpc;
+package com.ljt.study.rpc.transport;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -25,7 +25,8 @@ import static com.ljt.study.rpc.protocol.ProtocolManage.getClientChannelInitiali
 @Slf4j
 public class ClientFactory {
 
-    private ClientFactory() {}
+    private ClientFactory() {
+    }
 
     private static final int POOL_SIZE = 2;
     private static final Random RAND = new Random();

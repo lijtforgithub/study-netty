@@ -17,7 +17,7 @@ import java.io.ObjectInputStream;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
 
-import static com.ljt.study.rpc.ClientFactory.createClient;
+import static com.ljt.study.rpc.transport.ClientFactory.createClient;
 import static com.ljt.study.rpc.RpcUtils.serial;
 import static com.ljt.study.rpc.protocol.ProtocolManage.MAX_CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
@@ -48,8 +48,8 @@ public class NettyHttpTransporter implements Transporter {
                                 byte[] bytes = new byte[byteBuf.readableBytes()];
                                 byteBuf.readBytes(bytes);
 
-                                ObjectInputStream objInput = new ObjectInputStream(new ByteArrayInputStream(bytes));
-                                ResponseBody body = (ResponseBody) objInput.readObject();
+                                ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes));
+                                ResponseBody body = (ResponseBody) input.readObject();
                                 future.complete(body.getResult());
                             }
                         });

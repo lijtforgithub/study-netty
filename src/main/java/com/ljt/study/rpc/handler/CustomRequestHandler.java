@@ -1,6 +1,5 @@
 package com.ljt.study.rpc.handler;
 
-import com.ljt.study.rpc.Invoker;
 import com.ljt.study.rpc.protocol.CustomHeader;
 import com.ljt.study.rpc.protocol.CustomPackage;
 import com.ljt.study.rpc.protocol.RequestBody;
@@ -13,10 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.Executor;
 
+import static com.ljt.study.rpc.RpcUtils.invoke;
 import static com.ljt.study.rpc.RpcUtils.serial;
 
-
 /**
+ * 自定义协议：服务端处理请求 调用接口实现方法
+ *
  * @author LiJingTang
  * @date 2021-03-06 22:33
  */
@@ -25,8 +26,8 @@ public class CustomRequestHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        // 已在CustomProtocolDecode里处理成此对象
         CustomPackage pck = (CustomPackage) msg;
-
         /*
          * 直接在当前方法 处理IO和业务和返回
          * 自己创建线程池
@@ -41,7 +42,7 @@ public class CustomRequestHandler extends ChannelHandlerAdapter {
             log.debug("IO: {} 业务：{}", ioThread, Thread.currentThread().getName());
 
             RequestBody requestBody = pck.getRequestBody();
-            Object result = Invoker.invoke(requestBody.getTypeName(), requestBody.getMethodName(),
+            Object result = invoke(requestBody.getTypeName(), requestBody.getMethodName(),
                     requestBody.getParameterTypes(), requestBody.getArgs());
             ResponseBody responseBody = new ResponseBody();
             responseBody.setResult(result);

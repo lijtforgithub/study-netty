@@ -1,7 +1,6 @@
 package com.ljt.study.rpc.transport;
 
-import com.ljt.study.rpc.ClientFactory;
-import com.ljt.study.rpc.ResponseCallback;
+import com.ljt.study.rpc.CustomProtocolCallback;
 import com.ljt.study.rpc.protocol.CustomHeader;
 import com.ljt.study.rpc.protocol.RequestBody;
 import io.netty.buffer.ByteBuf;
@@ -26,7 +25,7 @@ public class CustomProtocolTransporter implements Transporter {
         final byte[] header = serial(customHeader);
 
         CompletableFuture<Object> future = new CompletableFuture<>();
-        ResponseCallback.add(customHeader.getRequestId(), future);
+        CustomProtocolCallback.add(customHeader.getRequestId(), future);
 
         ByteBuf byteBuf = PooledByteBufAllocator.DEFAULT.directBuffer(header.length + body.length);
         byteBuf.writeBytes(header).writeBytes(body);

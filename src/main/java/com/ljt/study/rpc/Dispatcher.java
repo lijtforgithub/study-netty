@@ -12,7 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class Dispatcher {
 
-    private Dispatcher() {}
+    private Dispatcher() {
+    }
 
     private static final Map<Class<?>, Object> MAP = new ConcurrentHashMap<>();
 

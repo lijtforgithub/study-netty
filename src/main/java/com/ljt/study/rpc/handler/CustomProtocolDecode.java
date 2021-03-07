@@ -14,7 +14,7 @@ import static com.ljt.study.rpc.RpcUtils.*;
 import static com.ljt.study.rpc.protocol.CustomHeader.LENGTH;
 
 /**
- * 粘包拆包
+ * 自定义协议的粘包拆包
  *
  * @author LiJingTang
  * @date 2021-03-06 21:45
@@ -22,19 +22,19 @@ import static com.ljt.study.rpc.protocol.CustomHeader.LENGTH;
 public class CustomProtocolDecode extends ByteToMessageDecoder {
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        while (in.readableBytes() > LENGTH) {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
+        while (byteBuf.readableBytes() > LENGTH) {
             byte[] header = new byte[LENGTH];
             // readerIndex 不变
-            in.getBytes(in.readerIndex(), header);
+            byteBuf.getBytes(byteBuf.readerIndex(), header);
             CustomHeader customHeader = unSerialHeader(header);
 
             // 是否包含整个消息体
-            if (in.readableBytes() - LENGTH >= customHeader.getContentLength()) {
+            if (byteBuf.readableBytes() - LENGTH >= customHeader.getContentLength()) {
                 // readerIndex 移动
-                in.readBytes(LENGTH);
+                byteBuf.readBytes(LENGTH);
                 byte[] body = new byte[customHeader.getContentLength()];
-                in.readBytes(body);
+                byteBuf.readBytes(body);
 
                 CustomPackage pck = new CustomPackage();
                 pck.setHeader(customHeader);

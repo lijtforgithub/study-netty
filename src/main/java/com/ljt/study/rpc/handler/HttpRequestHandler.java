@@ -1,6 +1,5 @@
 package com.ljt.study.rpc.handler;
 
-import com.ljt.study.rpc.Invoker;
 import com.ljt.study.rpc.protocol.RequestBody;
 import com.ljt.study.rpc.protocol.ResponseBody;
 import io.netty.buffer.ByteBuf;
@@ -10,8 +9,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.ljt.study.rpc.RpcUtils.serial;
-import static com.ljt.study.rpc.RpcUtils.unSerialRequestBody;
+import static com.ljt.study.rpc.RpcUtils.*;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 
 /**
@@ -31,7 +29,7 @@ public class HttpRequestHandler extends ChannelHandlerAdapter {
         byteBuf.readBytes(bytes);
 
         RequestBody requestBody = unSerialRequestBody(bytes);
-        Object result = Invoker.invoke(requestBody.getTypeName(), requestBody.getMethodName(),
+        Object result = invoke(requestBody.getTypeName(), requestBody.getMethodName(),
                 requestBody.getParameterTypes(), requestBody.getArgs());
         ResponseBody responseBody = new ResponseBody();
         responseBody.setResult(result);

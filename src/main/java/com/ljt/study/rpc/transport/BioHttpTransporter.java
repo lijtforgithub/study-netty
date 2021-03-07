@@ -28,12 +28,12 @@ public class BioHttpTransporter implements Transporter {
         connection.setRequestMethod(HttpMethod.POST.name());
         connection.setDoOutput(true);
 
-        ObjectOutputStream objOut = new ObjectOutputStream(connection.getOutputStream());
-        objOut.writeObject(requestBody);
+        ObjectOutputStream output = new ObjectOutputStream(connection.getOutputStream());
+        output.writeObject(requestBody);
 
         if (HttpResponseStatus.OK.code() == connection.getResponseCode()) {
-            ObjectInputStream objIn = new ObjectInputStream(connection.getInputStream());
-            ResponseBody obj = (ResponseBody) objIn.readObject();
+            ObjectInputStream input = new ObjectInputStream(connection.getInputStream());
+            ResponseBody obj = (ResponseBody) input.readObject();
             result = obj.getResult();
         }
 

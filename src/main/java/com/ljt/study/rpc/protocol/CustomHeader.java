@@ -13,6 +13,9 @@ import java.io.Serializable;
 @Getter
 public class CustomHeader implements Serializable {
 
+    /**
+     * 自定义协议对象序列化后的长度 如果包结构发生变动或增减属性 大小可能会变化
+     */
     public static final int LENGTH = 111;
 
     private static final long serialVersionUID = -7265379079086584564L;

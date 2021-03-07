@@ -28,7 +28,7 @@ public class RpcTest {
     public void startProvider() throws InterruptedException {
         Dispatcher.register(HelloService.class, new HelloServiceImpl());
         Dispatcher.register(UserService.class, new UserServiceImpl());
-        new Server().start();
+        new RpcServer().start();
     }
 
     @SneakyThrows
@@ -40,7 +40,7 @@ public class RpcTest {
 
         for (int i = 0; i < size; i++) {
             threads[i] = new Thread(() -> {
-                UserService userService = ProxyUtils.generate(UserService.class);
+                UserService userService = RpcProxy.generate(UserService.class);
                 System.out.println(userService.getUser(num.incrementAndGet()));
             });
         }
@@ -56,7 +56,7 @@ public class RpcTest {
     @Test
     public void testLc() {
         Dispatcher.register(HelloService.class, new HelloServiceImpl());
-        HelloService helloService = ProxyUtils.generate(HelloService.class);
+        HelloService helloService = RpcProxy.generate(HelloService.class);
         System.out.println(helloService.say("同一个JVM调用"));
     }
 

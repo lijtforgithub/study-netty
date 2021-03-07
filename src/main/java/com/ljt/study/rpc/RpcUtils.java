@@ -76,4 +76,16 @@ public class RpcUtils {
         return body;
     }
 
+    public static Object invoke(String typeName, String methodName, Class<?>[] parameterTypes, Object[] args) {
+        try {
+            Class<?> clazz = Class.forName(typeName);
+            Object obj = Dispatcher.get(clazz);
+            Method method = clazz.getMethod(methodName, parameterTypes);
+            return method.invoke(obj, args);
+        } catch (Exception e) {
+            log.error("反射调用方法异常", e);
+            return null;
+        }
+    }
+
 }

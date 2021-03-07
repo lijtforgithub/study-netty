@@ -16,7 +16,7 @@ import static com.ljt.study.rpc.protocol.ProtocolManage.getServerChannelInitiali
  * @date 2021-03-06 22:26
  */
 @Slf4j
-public class Server {
+public class RpcServer {
 
     public void start() throws InterruptedException {
         // 配置服务端的NIO线程组

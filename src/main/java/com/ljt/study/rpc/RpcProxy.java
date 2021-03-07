@@ -18,13 +18,13 @@ import static com.ljt.study.rpc.protocol.ProtocolManage.getTransporter;
  * @date 2021-03-06 17:01
  */
 @Slf4j
-public class ProxyUtils {
+public class RpcProxy {
 
-    private ProxyUtils() {
+    private RpcProxy() {
     }
 
     public static <T> T generate(Class<T> clazz) {
-        ClassLoader classLoader = ProxyUtils.class.getClassLoader();
+        ClassLoader classLoader = RpcProxy.class.getClassLoader();
         Class<?>[] interfaces = new Class[]{clazz};
         @SuppressWarnings("unchecked")
         T result = (T) Proxy.newProxyInstance(classLoader, interfaces, (Object proxy, Method method, Object[] args) -> {
