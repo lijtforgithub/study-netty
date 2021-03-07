@@ -21,11 +21,11 @@ public class RpcTest {
 
     @Before
     public void setProtocol() {
-        System.setProperty(PROTOCOL, ProtocolEnum.BIO_HTTP.name());
+        System.setProperty(PROTOCOL, ProtocolEnum.CUSTOM_RPC.name());
     }
 
     @Test
-    public void startProvider() {
+    public void startProvider() throws InterruptedException {
         Dispatcher.register(HelloService.class, new HelloServiceImpl());
         Dispatcher.register(UserService.class, new UserServiceImpl());
         new Server().start();

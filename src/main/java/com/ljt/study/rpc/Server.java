@@ -6,9 +6,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
-import static com.ljt.study.rpc.RpcUtils.ADDRESS;
+import static com.ljt.study.Constant.LOCAL_HOST;
+import static com.ljt.study.Constant.PORT;
 import static com.ljt.study.rpc.protocol.ProtocolManage.getServerChannelInitializer;
 
 /**
@@ -18,25 +18,21 @@ import static com.ljt.study.rpc.protocol.ProtocolManage.getServerChannelInitiali
 @Slf4j
 public class Server {
 
-    public void start() {
+    public void start() throws InterruptedException {
         // 配置服务端的NIO线程组
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workGroup = new NioEventLoopGroup(4);
+        ServerBootstrap bootstrap = new ServerBootstrap();
 
-        try {
-            ServerBootstrap bootstrap = new ServerBootstrap();
-            bootstrap.group(bossGroup, workGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(getServerChannelInitializer());
-            // 绑定端口 同步等待成功
-            ChannelFuture future = bootstrap.bind(ADDRESS).sync();
-            log.info("服务端启动成功 {}", ADDRESS);
-            // 等待服务端口监听端口关闭
-            future.channel().closeFuture().sync();
-            log.info("服务端关闭");
-        } catch (InterruptedException e) {
-            log.error(StringUtils.EMPTY, e);
-        }
+        bootstrap.group(bossGroup, workGroup)
+                .channel(NioServerSocketChannel.class)
+                .childHandler(getServerChannelInitializer());
+        // 绑定端口 同步等待成功
+        ChannelFuture future = bootstrap.bind(LOCAL_HOST, PORT).sync();
+        log.info("服务端启动成功 {}:{}", LOCAL_HOST, PORT);
+        // 等待服务端口监听端口关闭
+        future.channel().closeFuture().sync();
+        log.info("服务端关闭");
     }
 
 }

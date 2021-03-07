@@ -7,10 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.lang.reflect.Method;
-import java.net.InetSocketAddress;
 import java.util.UUID;
-
-import static com.ljt.study.Constant.LOCAL_HOST;
 
 /**
  * @author LiJingTang
@@ -19,8 +16,6 @@ import static com.ljt.study.Constant.LOCAL_HOST;
 @Slf4j
 public class RpcUtils {
 
-    public static final InetSocketAddress ADDRESS = new InetSocketAddress(LOCAL_HOST, 9090);
-    public static final String HTTP_URL = "http://localhost:9090/";
     public static final String PROTOCOL = "protocol";
 
     private RpcUtils() {

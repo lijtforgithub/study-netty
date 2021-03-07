@@ -6,6 +6,7 @@ import com.ljt.study.rpc.handler.CustomResponseHandler;
 import com.ljt.study.rpc.handler.HttpRequestHandler;
 import com.ljt.study.rpc.transport.BioHttpTransporter;
 import com.ljt.study.rpc.transport.CustomProtocolTransporter;
+import com.ljt.study.rpc.transport.NettyHttpTransporter;
 import com.ljt.study.rpc.transport.Transporter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -29,6 +30,8 @@ public class ProtocolManage {
     private static Transporter transporter;
     private static ChannelInitializer<NioSocketChannel> clientChannelInitializer;
     private static ChannelInitializer<NioSocketChannel> serverChannelInitializer;
+
+    public static final int MAX_CONTENT_LENGTH = 1024 * 512;
 
     static {
         final String protocolName = System.getProperty(PROTOCOL, CUSTOM_RPC.name());
@@ -61,14 +64,25 @@ public class ProtocolManage {
                     protected void initChannel(NioSocketChannel ch) {
                         log.info("客户端接入：{}", ch.remoteAddress().getPort());
                         ch.pipeline().addLast(new HttpServerCodec())
-                                .addLast(new HttpObjectAggregator(1024*512))
+                                .addLast(new HttpObjectAggregator(MAX_CONTENT_LENGTH))
                                 .addLast(new HttpRequestHandler());
                     }
                 };
                 break;
             case NETTY_HTTP:
+                transporter = new NettyHttpTransporter();
+                serverChannelInitializer = new ChannelInitializer<NioSocketChannel>() {
+                    @Override
+                    protected void initChannel(NioSocketChannel ch) {
+                        log.info("客户端接入：{}", ch.remoteAddress().getPort());
+                        ch.pipeline().addLast(new HttpServerCodec())
+                                .addLast(new HttpObjectAggregator(MAX_CONTENT_LENGTH))
+                                .addLast(new HttpRequestHandler());
+                    }
+                };
                 break;
-            default: break;
+            default:
+                break;
         }
     }
 

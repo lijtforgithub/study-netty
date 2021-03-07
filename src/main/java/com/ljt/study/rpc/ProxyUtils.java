@@ -1,6 +1,5 @@
 package com.ljt.study.rpc;
 
-import com.ljt.study.rpc.protocol.ProtocolManage;
 import com.ljt.study.rpc.protocol.RequestBody;
 import lombok.extern.slf4j.Slf4j;
 
@@ -9,7 +8,10 @@ import java.lang.reflect.Proxy;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
+import static com.ljt.study.Constant.LOCAL_HOST;
+import static com.ljt.study.Constant.PORT;
 import static com.ljt.study.rpc.RpcUtils.createRequestBody;
+import static com.ljt.study.rpc.protocol.ProtocolManage.getTransporter;
 
 /**
  * @author LiJingTang
@@ -34,7 +36,7 @@ public class ProxyUtils {
             } else {
                 log.debug("RPC: Remote Procedure Call");
                 RequestBody requestBody = createRequestBody(clazz, method, args);
-                CompletableFuture<Object> future = ProtocolManage.getTransporter().transport(requestBody);
+                CompletableFuture<Object> future = getTransporter().transport(LOCAL_HOST, PORT, requestBody);
 
                 return future.get();
             }

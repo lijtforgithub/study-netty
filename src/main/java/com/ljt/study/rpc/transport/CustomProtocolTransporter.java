@@ -8,6 +8,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.socket.SocketChannel;
 
+import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
 
 import static com.ljt.study.rpc.RpcUtils.*;
@@ -19,7 +20,7 @@ import static com.ljt.study.rpc.RpcUtils.*;
 public class CustomProtocolTransporter implements Transporter {
 
     @Override
-    public CompletableFuture<Object> transport(RequestBody requestBody) {
+    public CompletableFuture<Object> transport(String host, int port, RequestBody requestBody) {
         final byte[] body = serial(requestBody);
         CustomHeader customHeader = createHeader(body.length);
         final byte[] header = serial(customHeader);
@@ -29,7 +30,7 @@ public class CustomProtocolTransporter implements Transporter {
 
         ByteBuf byteBuf = PooledByteBufAllocator.DEFAULT.directBuffer(header.length + body.length);
         byteBuf.writeBytes(header).writeBytes(body);
-        SocketChannel client = ClientFactory.getClient(ADDRESS);
+        SocketChannel client = ClientFactory.getClient(new InetSocketAddress(host, port));
         client.writeAndFlush(byteBuf);
 
         return future;

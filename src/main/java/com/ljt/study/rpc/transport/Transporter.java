@@ -13,9 +13,12 @@ public interface Transporter {
     /**
      * 发送请求
      *
+     * @param host        主机
+     * @param port        端口号
      * @param requestBody 请求参数
      * @return 异步响应
+     * @throws Exception 发送异常
      */
-    CompletableFuture<Object> transport(RequestBody requestBody);
+    CompletableFuture<Object> transport(String host, int port, RequestBody requestBody) throws Exception;
 
 }

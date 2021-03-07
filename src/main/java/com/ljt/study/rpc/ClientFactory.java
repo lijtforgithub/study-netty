@@ -1,7 +1,7 @@
 package com.ljt.study.rpc;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -9,7 +9,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -46,7 +45,7 @@ public class ClientFactory {
         if (pool.nonClient(i)) {
             synchronized (pool.getLocks()[i]) {
                 if (pool.nonClient(i)) {
-                    pool.getClients()[i] = createClient(socketAddress);
+                    pool.getClients()[i] = createClient(socketAddress, getClientChannelInitializer());
                 }
             }
         }
@@ -54,19 +53,18 @@ public class ClientFactory {
         return pool.getClients()[i];
     }
 
-    private static SocketChannel createClient(InetSocketAddress socketAddress) {
+    public static SocketChannel createClient(InetSocketAddress socketAddress, ChannelInitializer<NioSocketChannel> channelInitializer) {
         try {
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(GROUP)
                     .channel(NioSocketChannel.class)
-                    .option(ChannelOption.TCP_NODELAY, true)
-                    .handler(getClientChannelInitializer());
+                    .handler(channelInitializer);
 
             SocketChannel channel = (SocketChannel) bootstrap.connect(socketAddress).sync().channel();
-            log.info("客户端创建成功 {}", socketAddress);
+            log.info("客户端创建成功 {}", channel.localAddress());
             return channel;
         } catch (Exception e) {
-            log.error(StringUtils.EMPTY, e);
+            log.error("创建客户端异常", e);
             return null;
         }
     }

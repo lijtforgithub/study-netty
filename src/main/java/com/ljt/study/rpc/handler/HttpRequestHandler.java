@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import static com.ljt.study.rpc.RpcUtils.serial;
 import static com.ljt.study.rpc.RpcUtils.unSerialRequestBody;
+import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 
 /**
  * @author LiJingTang
@@ -23,7 +24,7 @@ public class HttpRequestHandler extends ChannelHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         FullHttpRequest request = (FullHttpRequest) msg;
-        log.debug("服务端接收到请求：" + request);
+        log.debug(request.toString());
 
         ByteBuf byteBuf = request.content();
         byte[] bytes = new byte[byteBuf.readableBytes()];
@@ -38,6 +39,9 @@ public class HttpRequestHandler extends ChannelHandlerAdapter {
         final byte[] body = serial(responseBody);
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_0,
                 HttpResponseStatus.OK, Unpooled.copiedBuffer(body));
+
+        // netty-http 是必须
+        response.headers().set(CONTENT_LENGTH, body.length);
         ctx.writeAndFlush(response);
     }
 
