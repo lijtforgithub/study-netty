@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.ToString;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,7 +19,7 @@ import static com.ljt.study.rpc.RpcUtils.PROTOCOL;
  */
 public class RpcTest {
 
-    @Before
+    @BeforeEach
     public void setProtocol() {
         System.setProperty(PROTOCOL, ProtocolEnum.CUSTOM_RPC.name());
     }
