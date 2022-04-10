@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.ljt.study.Constant.PORT;
+import static com.ljt.study.Constant.DEF_PORT;
 import static io.netty.util.CharsetUtil.UTF_8;
 
 /**
@@ -33,7 +33,7 @@ public class UdpServer {
                     .channel(NioDatagramChannel.class)
                     .option(ChannelOption.SO_BROADCAST, true)
                     .handler(new ServerHandler());
-            bootstrap.bind(PORT).sync().channel().closeFuture().await();
+            bootstrap.bind(DEF_PORT).sync().channel().closeFuture().await();
         } catch (InterruptedException e) {
             log.error(StringUtils.EMPTY, e);
         } finally {

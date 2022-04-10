@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game</title>
+</head>
+<script>
+    // UTF-8 encoding
+    const encoder = new TextEncoder();
+    const ws = new WebSocket('ws://localhost:12345');
+
+    ws.onmessage = function (event) {
+        const blob = event.data;
+        blob.slice(0, 2).arrayBuffer().then(buffer => {
+            const array = new Uint8Array(buffer);
+            const type = bytesToIntBE(Array.from(array));
+            console.log('消息类型', type);
+        });
+        blob.slice(2, blob.size).text().then(text => {
+            document.getElementById('msg').innerText = text;
+        });
+    };
+
+    function send() {
+        if (WebSocket.OPEN == ws.readyState) {
+            const text = document.getElementById('text').value;
+            if (!text) {
+                alert('内容为空');
+            }
+            const type = document.getElementById('select').value;
+            const msg = encoder.encode(getMsg(type, text));
+            const t = intToBytesBE(type, 2);
+
+            const bytes = Uint8Array.of(...t, ...msg)
+            ws.send(bytes);
+        } else {
+            console.warn('连接已关闭', ws.readyState);
+        }
+    }
+
+    function getMsg(type, text) {
+        let obj;
+        if (1 == type) {
+            obj = {
+                userId: Math.floor((Math.random() * 1000) + 1),
+                password: new Date().getTime(),
+                content: text
+            }
+        } else if (2 == type) {
+            obj = {
+                targetUserId: Math.floor((Math.random() * 1000) + 1),
+                hp: Math.floor((Math.random() * 1000) + 1),
+                content: text
+            }
+        } else {
+            obj = {
+                content: text
+            }
+        }
+
+        return JSON.stringify(obj);
+    }
+
+    /**
+     * 大端模式
+     *
+     * @param num 整数值
+     * @param len 规定数组长度 uint16表示2个字节 len=2 uint32表示4个字节 len=4
+     * @returns {*[]}
+     */
+    function intToBytesBE(num, len) {
+        let bytes = [];
+        let i = len;
+
+        do {
+            bytes[--i] = num & 255;
+            num = num >> 8;
+        } while (i);
+
+        return bytes;
+    }
+
+    function bytesToIntBE(bytes) {
+        let val = 0;
+        for (let i = 0; i < bytes.length; ++i) {
+            val += bytes[i];
+            if (i < bytes.length - 1) {
+                val = val << 8;
+            }
+        }
+        return val;
+    }
+</script>
+<body>
+<h1 id="msg"></h1>
+<hr/>
+类型：
+<select id="select">
+    <option value="1">Login</option>
+    <option value="2">Attack</option>
+</select>
+内容：
+<input type="text" id="text">
+<input type="button" onclick="send()" value=" Send ">
+</body>
+</html>

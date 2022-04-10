@@ -8,7 +8,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.ljt.study.Constant.LOCAL_HOST;
-import static com.ljt.study.Constant.PORT;
+import static com.ljt.study.Constant.DEF_PORT;
 import static com.ljt.study.rpc.protocol.ProtocolManage.getServerChannelInitializer;
 
 /**
@@ -28,8 +28,8 @@ public class RpcServer {
                 .channel(NioServerSocketChannel.class)
                 .childHandler(getServerChannelInitializer());
         // 绑定端口 同步等待成功
-        ChannelFuture future = bootstrap.bind(LOCAL_HOST, PORT).sync();
-        log.info("服务端启动成功 {}:{}", LOCAL_HOST, PORT);
+        ChannelFuture future = bootstrap.bind(LOCAL_HOST, DEF_PORT).sync();
+        log.info("服务端启动成功 {}:{}", LOCAL_HOST, DEF_PORT);
         // 等待服务端口监听端口关闭
         future.channel().closeFuture().sync();
         log.info("服务端关闭");

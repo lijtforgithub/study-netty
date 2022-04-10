@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
-import static com.ljt.study.Constant.PORT;
+import static com.ljt.study.Constant.DEF_PORT;
 
 /**
  * @author LiJingTang
@@ -51,7 +51,7 @@ class NettyTest {
         NioSocketChannel client = new NioSocketChannel(group.next());
         System.out.println(client.isRegistered());
 
-        ChannelFuture future = client.connect(new InetSocketAddress(PORT)).sync();
+        ChannelFuture future = client.connect(new InetSocketAddress(DEF_PORT)).sync();
         ByteBuf byteBuf = Unpooled.copiedBuffer("Hello Netty".getBytes());
         client.writeAndFlush(byteBuf).sync();
 

@@ -18,7 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static com.ljt.study.Constant.LOCAL_HOST;
-import static com.ljt.study.Constant.PORT;
+import static com.ljt.study.Constant.DEF_PORT;
 
 /**
  * @author LiJingTang
@@ -52,7 +52,7 @@ public class NettyClient {
                         }
                     });
             // 发起异步连接操作
-            ChannelFuture future = bootstrap.connect(new InetSocketAddress(LOCAL_HOST, PORT)
+            ChannelFuture future = bootstrap.connect(new InetSocketAddress(LOCAL_HOST, DEF_PORT)
                     // 指定客户端端口
 //                    , new InetSocketAddress(LOCAL_HOST, 8888)
             ).sync();

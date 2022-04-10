@@ -10,7 +10,8 @@ public class Constant {
     }
 
     public static final String LOCAL_HOST = "localhost";
-    public static final int PORT = 8080;
+    public static final String LOOP_IP = "127.0.0.1";
+    public static final int DEF_PORT = 8080;
 
     public static final String SYS_SEP = System.getProperty("line.separator");
 

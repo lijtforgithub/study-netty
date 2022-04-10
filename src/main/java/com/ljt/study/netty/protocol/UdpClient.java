@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.net.InetSocketAddress;
 
-import static com.ljt.study.Constant.PORT;
+import static com.ljt.study.Constant.DEF_PORT;
 import static io.netty.util.CharsetUtil.UTF_8;
 
 /**
@@ -32,7 +32,7 @@ public class UdpClient {
             Channel channel = bootstrap.bind(0).sync().channel();
             channel.writeAndFlush(
                     new DatagramPacket(Unpooled.copiedBuffer("诗词", UTF_8),
-                            new InetSocketAddress("255.255.255.255", PORT))).sync();
+                            new InetSocketAddress("255.255.255.255", DEF_PORT))).sync();
             if (!channel.closeFuture().await(15000)) {
                 log.warn("查询超时");
             }

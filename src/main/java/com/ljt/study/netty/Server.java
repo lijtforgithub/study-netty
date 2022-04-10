@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import static com.ljt.study.Constant.LOCAL_HOST;
-import static com.ljt.study.Constant.PORT;
+import static com.ljt.study.Constant.DEF_PORT;
 
 /**
  * @author LiJingTang
@@ -29,7 +29,7 @@ public class Server {
     private ChannelHandler channelHandler;
 
     public Server(ChannelHandler channelHandler) {
-        this.port = PORT;
+        this.port = DEF_PORT;
         this.host = LOCAL_HOST;
         this.channelHandler = channelHandler;
     }

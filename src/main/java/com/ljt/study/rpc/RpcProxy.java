@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import static com.ljt.study.Constant.LOCAL_HOST;
-import static com.ljt.study.Constant.PORT;
+import static com.ljt.study.Constant.DEF_PORT;
 import static com.ljt.study.rpc.RpcUtils.createRequestBody;
 import static com.ljt.study.rpc.protocol.ProtocolManage.getTransporter;
 
@@ -36,7 +36,7 @@ public class RpcProxy {
             } else {
                 log.debug("RPC: Remote Procedure Call");
                 RequestBody requestBody = createRequestBody(clazz, method, args);
-                CompletableFuture<Object> future = getTransporter().transport(LOCAL_HOST, PORT, requestBody);
+                CompletableFuture<Object> future = getTransporter().transport(LOCAL_HOST, DEF_PORT, requestBody);
 
                 return future.get();
             }
