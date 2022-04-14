@@ -8,6 +8,7 @@ import com.ljt.study.game.core.GameMsgDecoder;
 import com.ljt.study.game.core.GameMsgEncoder;
 import com.ljt.study.game.core.GameMsgHandler;
 import com.ljt.study.game.core.MsgHandlerFactory;
+import com.ljt.study.game.enums.ServiceTypeEnum;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -51,7 +52,7 @@ class GameServer {
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
+                        protected void initChannel(SocketChannel ch) {
                             ch.pipeline().addLast(
                                     new HttpServerCodec(), // 添加 Http 编解码器
                                     new HttpObjectAggregator(65535), // 内容不能太长
@@ -68,7 +69,7 @@ class GameServer {
 
             if (future.isSuccess()) {
                 log.info("服务启动成功：{} ", port);
-                registerServer(null, LOOP_IP, port);
+                registerServer(LOOP_IP, port);
             }
 
             future.channel().closeFuture().sync();
@@ -95,22 +96,19 @@ class GameServer {
         return Integer.parseInt(cmdLine.getOptionValue(PORT, String.valueOf(DEF_PORT)));
     }
 
-    private static void registerServer(String groupName, String ip, int port) {
-        String server = PropUtils.getNacosServer();
-        if (StringUtils.isBlank(server)) {
+    private static void registerServer(String ip, int port) {
+        String serverAddress = PropUtils.getNacosServer();
+        if (StringUtils.isBlank(serverAddress)) {
             log.warn("Nacos 服务地址为空");
             return;
         }
 
         try {
             String serviceName = PropUtils.getServiceName();
-            NamingService ns = NamingFactory.createNamingService(server);
-            if (StringUtils.isNotBlank(groupName)) {
-                ns.registerInstance(serviceName, groupName, ip, port);
-            } else {
-                ns.registerInstance(serviceName, ip, port);
-            }
-            log.info("注册服务{}成功", serviceName);
+            NamingService ns = NamingFactory.createNamingService(serverAddress);
+            String groupName = port > DEF_PORT ? ServiceTypeEnum.GAME.name() : ServiceTypeEnum.LOGIN.name();
+            ns.registerInstance(serviceName, groupName, ip, port);
+            log.info("注册服务{} => {}成功", serviceName, groupName);
         } catch (NacosException e) {
             e.printStackTrace();
         }

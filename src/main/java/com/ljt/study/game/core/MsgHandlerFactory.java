@@ -45,6 +45,7 @@ public final class MsgHandlerFactory {
             if (Objects.nonNull(msgType)) {
                 MsgHandler<?> handler = (MsgHandler<?>) clazz.newInstance();
                 HANDLER_MAP.put(msgType, handler);
+                log.info("初始化消息处理器：{} = {}", msgType, handler);
             }
         }
     }
