@@ -1,6 +1,7 @@
 package com.ljt.study.game.service;
 
-import com.ljt.study.game.core.AsyncProcessor;
+import com.ljt.study.game.processor.AsyncOperation;
+import com.ljt.study.game.processor.AsyncProcessor;
 import com.ljt.study.game.msg.LoginMsg;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +41,17 @@ public class LoginService {
             return msg;
         };
 
-        AsyncProcessor.process(supplier, consumer);
+        AsyncProcessor.process(new AsyncOperation<LoginMsg>() {
+            @Override
+            public LoginMsg get() {
+                return supplier.get();
+            }
+
+            @Override
+            public void accept(LoginMsg loginMsg) {
+                consumer.accept(loginMsg);
+            }
+        });
     }
 
 }
