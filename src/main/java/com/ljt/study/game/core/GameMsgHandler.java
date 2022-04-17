@@ -1,12 +1,8 @@
 package com.ljt.study.game.core;
 
-import com.ljt.study.game.handler.MsgHandler;
-import com.ljt.study.game.msg.BaseMsg;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Objects;
 
 /**
  * @author LiJingTang
@@ -29,18 +25,14 @@ public class GameMsgHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, Object msg) {
-        if (!(msg instanceof BaseMsg)) {
+        if (!(msg instanceof MsgDTO)) {
             log.warn("未知消息：{}", msg);
             return;
         }
 
-        MsgHandler<?> handler = MsgHandlerFactory.getHandler(msg.getClass());
-        if (Objects.isNull(handler)) {
-            log.warn("无法处理消息：{}", msg.getClass().getName());
-            return;
-        }
+        MsgDTO dto = (MsgDTO) msg;
 
-        MainProcessor.process(handler, ctx, (BaseMsg) msg);
+        MainProcessor.process(ctx, dto);
     }
 
 }

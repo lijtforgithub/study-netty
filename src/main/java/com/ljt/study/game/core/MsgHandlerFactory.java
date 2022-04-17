@@ -8,10 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author LiJingTang
@@ -54,9 +51,10 @@ public final class MsgHandlerFactory {
         Method[] methods = clazz.getDeclaredMethods();
 
         for (Method method : methods) {
+            boolean flag = method.isBridge() || method.isSynthetic();
             Class<?>[] paramTypes = method.getParameterTypes();
 
-            if (!(METHOD_NAME.equals(method.getName()) && paramTypes.length == 2
+            if (flag || !(METHOD_NAME.equals(method.getName()) && paramTypes.length == 2
                     && paramTypes[0] == HandlerContext.class
                     && BaseMsg.class.isAssignableFrom(paramTypes[1]))) {
                 continue;

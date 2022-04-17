@@ -40,23 +40,27 @@ public final class ServiceDiscovery {
                     NamingEvent nEvent = (NamingEvent) event;
                     List<Instance> instances = nEvent.getInstances();
                     instances.forEach(ServiceDiscovery::connect);
+                    log.info("连接服务器完成：{}", GROUP);
                 });
             }
-
         } catch (Exception e) {
             log.error("发现服务异常", e);
         }
     }
 
     private static void connect(Instance instance) {
+        log.info("开始连接：{} 可用状态：{}", instance.getInstanceId(), instance.isHealthy());
         String serviceId = instance.getInstanceId();
 
-        if (GROUP.containsKey(serviceId)) {
+        if (!instance.isHealthy() && GROUP.containsKey(serviceId)) {
             return;
         }
 
         try {
-            NettyClient client = new NettyClient(serviceId, future -> GROUP.remove(serviceId));
+            NettyClient client = new NettyClient(serviceId, future -> {
+                GROUP.remove(serviceId);
+                log.info("移除服务器：{} 剩余服务器：{}", serviceId, GROUP);
+            });
             client.connect(instance.getIp(), instance.getPort());
             GROUP.put(serviceId, client);
             log.info("发现服务：{} {}", instance.getServiceName(), instance.getPort());
@@ -73,6 +77,7 @@ public final class ServiceDiscovery {
         try {
             Instance instance = ns.selectOneHealthyInstance(PropUtils.getServiceName(), typeEnum.name());
             if (Objects.nonNull(instance)) {
+                log.info("筛选出的服务器：{}", instance.getInstanceId());
                 return GROUP.get(instance.getInstanceId());
             }
         } catch (NacosException e) {

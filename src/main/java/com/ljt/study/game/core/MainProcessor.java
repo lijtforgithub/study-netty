@@ -5,6 +5,7 @@ import com.ljt.study.game.msg.BaseMsg;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -28,11 +29,17 @@ public final class MainProcessor {
         });
     }
 
-    public static void process(MsgHandler<?> handler, ChannelHandlerContext ctx, BaseMsg msg) {
-        log.info("提交主任务: {}", msg);
+    public static void process(ChannelHandlerContext ctx, MsgDTO dto) {
+        MsgHandler<?> handler = MsgHandlerFactory.getHandler(dto.getMsg().getClass());
+        if (Objects.isNull(handler)) {
+            log.warn("无法处理消息：{}", dto.getMsg().getClass().getName());
+            return;
+        }
+
+        log.info("提交主任务: {}", dto);
         EXECUTOR.execute(() -> {
-            HandlerContext context = new HandlerContext(ctx);
-            handler.handle(context, cast(msg));
+            HandlerContext context = new HandlerContext(ctx, dto.getSessionId());
+            handler.handle(context, cast(dto.getMsg()));
         });
     }
 

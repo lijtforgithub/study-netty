@@ -68,7 +68,8 @@ public final class NettyClient {
                         ch.pipeline().addLast(
                                 new HttpClientCodec(), // Http 客户端编解码器
                                 new HttpObjectAggregator(65535),
-                                new WebSocketClientProtocolHandler(handshake)
+                                new WebSocketClientProtocolHandler(handshake),
+                                new InternalMsgHandler()
                         );
                     }
                 });

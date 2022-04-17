@@ -25,9 +25,11 @@ public class GameMsgDecoder extends ChannelHandlerAdapter {
             return;
         }
 
-        BinaryWebSocketFrame inputFrame = (BinaryWebSocketFrame) msg;
-        ByteBuf byteBuf = inputFrame.content();
+        BinaryWebSocketFrame frame = (BinaryWebSocketFrame) msg;
+        ByteBuf byteBuf = frame.content();
 
+        int sessionId = byteBuf.readInt();
+        log.info("接收sessionId={}", sessionId);
         // 读取消息类型
         short type = byteBuf.readShort();
         Class<? extends BaseMsg> clazz = MsgTypeEnum.getMsgType(type);
@@ -38,13 +40,17 @@ public class GameMsgDecoder extends ChannelHandlerAdapter {
 
         byte[] message = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(message);
-        String text = new String(message);
-        log.debug("消息：{} => {}", clazz.getSimpleName(), text);
+        String content = new String(message);
+        log.debug("消息：{} => {}", clazz.getSimpleName(), content);
 
-        BaseMsg obj = JSON.parseObject(text, clazz);
+        BaseMsg obj = JSON.parseObject(content, clazz);
+
+        MsgDTO dto = new MsgDTO();
+        dto.setSessionId(sessionId);
+        dto.setMsg(obj);
 
         // 管道向下传递
-        ctx.fireChannelRead(obj);
+        ctx.fireChannelRead(dto);
     }
 
 }

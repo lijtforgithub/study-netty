@@ -1,13 +1,13 @@
 package com.ljt.study.gateway.core;
 
 import com.ljt.study.game.enums.ServiceTypeEnum;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
-import java.util.Random;
 
 /**
  * @author LiJingTang
@@ -30,15 +30,32 @@ public class ClientMsgHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        int i = new Random().nextInt(3) - 1;
-        NettyClient client = ServiceDiscovery.getClientByType(ServiceTypeEnum.values()[i]);
-        if (Objects.nonNull(client) && msg instanceof BinaryWebSocketFrame) {
-            BinaryWebSocketFrame frame = (BinaryWebSocketFrame) msg;
-            BinaryWebSocketFrame newFrame = new BinaryWebSocketFrame(frame.content().copy());
-            client.sendMsg(newFrame);
-        } else {
+        Integer sessionId = SessionManage.getSessionId(ctx.channel());
+        if (Objects.isNull(sessionId) || (!(msg instanceof BinaryWebSocketFrame))) {
             super.channelRead(ctx, msg);
+            log.warn("sessionId为空");
+            return;
         }
+
+        BinaryWebSocketFrame frame = (BinaryWebSocketFrame) msg;
+        ByteBuf byteBuf = frame.content();
+        short type = byteBuf.readShort();
+
+        ServiceTypeEnum typeEnum = 1 == type ? ServiceTypeEnum.LOGIN : ServiceTypeEnum.GAME;
+        NettyClient client = ServiceDiscovery.getClientByType(typeEnum);
+        if (Objects.isNull(client)) {
+            log.warn("NettyClient为空");
+            return;
+        }
+
+        ByteBuf newByteBuf = ctx.alloc().buffer();
+        newByteBuf.writeInt(sessionId);
+        newByteBuf.writeShort(type);
+        newByteBuf.writeBytes(byteBuf);
+
+        // frame.content().copy()
+        BinaryWebSocketFrame newFrame = new BinaryWebSocketFrame(newByteBuf);
+        client.sendMsg(newFrame);
     }
 
 }

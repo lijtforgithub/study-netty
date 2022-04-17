@@ -1,5 +1,6 @@
 package com.ljt.study.game.core;
 
+import com.ljt.study.game.msg.BaseMsg;
 import io.netty.channel.Channel;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
@@ -17,8 +18,11 @@ public final class Broadcaster {
 
     private static final ChannelGroup GROUP = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-    public static void broadcast(Object msg) {
-        GROUP.writeAndFlush(msg);
+    public static void broadcast(BaseMsg msg) {
+        MsgDTO dto = new MsgDTO();
+        dto.setMsg(msg);
+        dto.setSessionId(-1);
+        GROUP.writeAndFlush(dto);
     }
 
     public static void addChannel(Channel channel) {

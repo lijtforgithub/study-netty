@@ -2,7 +2,6 @@ package com.ljt.study.game.core;
 
 import com.alibaba.fastjson.JSON;
 import com.ljt.study.game.enums.MsgTypeEnum;
-import com.ljt.study.game.msg.BaseMsg;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,25 +20,28 @@ public class GameMsgEncoder extends ChannelHandlerAdapter {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (!(msg instanceof BaseMsg)) {
+        if (!(msg instanceof MsgDTO)) {
             super.write(ctx, msg, promise);
             return;
         }
 
-        short type = MsgTypeEnum.getValue(msg.getClass());
+        MsgDTO dto = (MsgDTO) msg;
+        short type = MsgTypeEnum.getValue(dto.getMsg().getClass());
         if (0 == type) {
             super.write(ctx, msg, promise);
-            log.warn("未知消息类型：{}", msg.getClass().getName());
+            log.warn("未知消息类型：{}", dto.getMsg().getClass().getName());
             return;
         }
 
-        String text = JSON.toJSONString(msg);
-        ByteBuf byteBuf = ctx.alloc().buffer();
-        byteBuf.writeShort(type);
-        byteBuf.writeBytes(text.getBytes(StandardCharsets.UTF_8));
 
-        BinaryWebSocketFrame outputFrame = new BinaryWebSocketFrame(byteBuf);
-        super.write(ctx, outputFrame, promise);
+        String content = JSON.toJSONString(dto.getMsg());
+        ByteBuf byteBuf = ctx.alloc().buffer();
+        byteBuf.writeInt(dto.getSessionId());
+        byteBuf.writeShort(type);
+        byteBuf.writeBytes(content.getBytes(StandardCharsets.UTF_8));
+
+        BinaryWebSocketFrame newFrame = new BinaryWebSocketFrame(byteBuf);
+        super.write(ctx, newFrame, promise);
     }
 
 }

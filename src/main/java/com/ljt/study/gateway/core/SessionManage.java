@@ -1,6 +1,8 @@
 package com.ljt.study.gateway.core;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,10 +51,13 @@ public final class SessionManage {
         return GROUP.get(sessionId);
     }
 
-    public static void broadcast(Object msg) {
+    public static void broadcast(byte[] bytes) {
+
         GROUP.forEach((k, v) -> {
             if (v.isOpen()) {
-                v.writeAndFlush(msg);
+                ByteBuf byteBuf = v.alloc().buffer();
+                byteBuf.writeBytes(bytes);
+                v.writeAndFlush(new BinaryWebSocketFrame(byteBuf));
             }
         });
     }

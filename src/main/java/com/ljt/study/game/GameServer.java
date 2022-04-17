@@ -109,6 +109,14 @@ class GameServer {
             String groupName = port > DEF_PORT ? ServiceTypeEnum.GAME.name() : ServiceTypeEnum.LOGIN.name();
             ns.registerInstance(serviceName, groupName, ip, port);
             log.info("注册服务{} => {}成功", serviceName, groupName);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    ns.deregisterInstance(serviceName, groupName, ip, port);
+                    log.info("下线服务成功");
+                } catch (NacosException e) {
+                    log.info("下线服务异常", e);
+                }
+            }));
         } catch (NacosException e) {
             e.printStackTrace();
         }
