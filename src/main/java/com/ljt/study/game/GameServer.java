@@ -111,6 +111,7 @@ class GameServer {
             log.info("注册服务{} => {}成功", serviceName, groupName);
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
+                    // 即使下线服务 不然短时间内重启 网关监听不到
                     ns.deregisterInstance(serviceName, groupName, ip, port);
                     log.info("下线服务成功");
                 } catch (NacosException e) {
