@@ -22,6 +22,7 @@ public class LoginMsgHandler implements MsgHandler<LoginMsg> {
 
         Consumer<User> consumer = user -> {
             log.info("用户登录成功：{}={}", user.getId(), user.getName());
+            context.setUserId(user.getId());
 
             LoginMsg loginMsg = new LoginMsg();
             loginMsg.setUserId(user.getId());

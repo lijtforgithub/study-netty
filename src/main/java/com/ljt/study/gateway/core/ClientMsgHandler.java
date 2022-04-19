@@ -2,14 +2,12 @@ package com.ljt.study.gateway.core;
 
 import com.ljt.study.game.enums.MsgTypeEnum;
 import com.ljt.study.game.enums.ServiceTypeEnum;
-import com.ljt.study.game.util.RedisUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -45,22 +43,21 @@ public class ClientMsgHandler extends ChannelHandlerAdapter {
         ByteBuf byteBuf = frame.content();
         short type = byteBuf.readShort();
         boolean isLoginCmd = MsgTypeEnum.LOGIN == MsgTypeEnum.getEnum(type);
-
-        ServiceTypeEnum typeEnum = isLoginCmd ? ServiceTypeEnum.LOGIN : ServiceTypeEnum.GAME;
         Integer userId = SessionManage.getUserId(ctx.channel());
 
         if (isLoginCmd) {
             if (Objects.nonNull(userId)) {
-                writeMsg(ctx, "您已经登录：" + RedisUtils.getUser(userId));
+                SessionManage.sendMsg(ctx, "请勿重复登录");
                 return;
             }
         } else {
             if (Objects.isNull(userId)) {
-                writeMsg(ctx, "请先登录...");
+                SessionManage.sendMsg(ctx, "请先登录...");
                 return;
             }
         }
 
+        ServiceTypeEnum typeEnum = isLoginCmd ? ServiceTypeEnum.LOGIN : ServiceTypeEnum.GAME;
         NettyClient client = ServiceDiscovery.getClientByType(typeEnum);
         if (Objects.isNull(client)) {
             log.warn("NettyClient为空");
@@ -76,14 +73,6 @@ public class ClientMsgHandler extends ChannelHandlerAdapter {
         // frame.content().copy()
         BinaryWebSocketFrame newFrame = new BinaryWebSocketFrame(newByteBuf);
         client.sendMsg(newFrame);
-    }
-
-    private void writeMsg(ChannelHandlerContext ctx, String msg) {
-        ByteBuf byteBuf = ctx.alloc().buffer();
-        byteBuf.writeShort(0);
-        byteBuf.writeBytes(msg.getBytes(StandardCharsets.UTF_8));
-        BinaryWebSocketFrame frame = new BinaryWebSocketFrame(byteBuf);
-        ctx.writeAndFlush(frame);
     }
 
 }

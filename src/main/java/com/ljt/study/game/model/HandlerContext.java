@@ -23,16 +23,13 @@ public final class HandlerContext {
         MsgDTO dto = new MsgDTO();
         dto.setMsg(msg);
         dto.setSessionId(sessionId);
+        dto.setUserId(userId);
 
         return channelContext.writeAndFlush(dto);
     }
 
     public void setUserId(Integer userId) {
         this.userId = userId;
-    }
-
-    public Integer getUserId() {
-        return userId;
     }
 
 }

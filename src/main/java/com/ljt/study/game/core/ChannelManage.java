@@ -23,6 +23,7 @@ public final class ChannelManage {
         MsgDTO dto = new MsgDTO();
         dto.setMsg(msg);
         dto.setSessionId(-1);
+        dto.setUserId(-1);
         GROUP.writeAndFlush(dto);
     }
 

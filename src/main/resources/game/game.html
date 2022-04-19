@@ -14,7 +14,12 @@
         ws = new WebSocket('ws://localhost:12345');
         ws.onopen = function () {
             document.getElementById('msg').innerText = '连接成功';
-            userId = Math.floor((Math.random() * 1000) + 1);
+            const id = document.getElementById('id').value;
+            if (id) {
+                userId = id;
+            } else {
+                userId = Math.floor((Math.random() * 10) + 1);
+            }
         }
         ws.onclose = function () {
             document.getElementById('msg').innerText = '连接关闭';
@@ -34,10 +39,11 @@
     }
 
     function send() {
-        if (WebSocket.OPEN == ws.readyState) {
+        if (ws !== undefined && WebSocket.OPEN === ws.readyState) {
             const text = document.getElementById('text').value;
             if (!text) {
                 alert('内容为空');
+                return;
             }
             const type = document.getElementById('select').value;
             const msg = encoder.encode(getMsg(type, text));
@@ -46,7 +52,7 @@
             const bytes = Uint8Array.of(...t, ...msg)
             ws.send(bytes);
         } else {
-            console.warn('连接已关闭', ws.readyState);
+            document.getElementById('msg').innerText = '连接已关闭';
         }
     }
 
@@ -111,8 +117,8 @@
     <option value="1">Login</option>
     <option value="2">Attack</option>
 </select>
-内容：
-<input type="text" id="text">
+用户：<input type="text" id="id"/>
+内容：<input type="text" id="text">
 <input type="button" onclick="send()" value=" Send ">
 <input type="button" onclick="connect()" value=" Connect ">
 </body>

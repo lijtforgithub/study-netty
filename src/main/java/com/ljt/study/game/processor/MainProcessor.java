@@ -42,9 +42,7 @@ public final class MainProcessor {
         log.info("提交主任务: {}", dto);
         EXECUTOR.execute(() -> {
             HandlerContext context = new HandlerContext(ctx, dto.getSessionId());
-            if (Objects.nonNull(dto.getUserId()) && dto.getUserId() > 0) {
-                context.setUserId(dto.getUserId());
-            }
+            context.setUserId(dto.getUserId());
 
             handler.handle(context, cast(dto.getMsg()));
         });

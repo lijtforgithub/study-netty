@@ -1,12 +1,17 @@
 package com.ljt.study.gateway.core;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -53,10 +58,11 @@ public final class SessionManage {
     }
 
     public static void setUserId(Channel channel, Integer userId) {
-        if (Objects.isNull(userId)) {
+        if (ObjectUtils.anyNull(channel, userId)) {
             return;
         }
         channel.attr(AttributeKey.valueOf(KEY_USER_ID)).setIfAbsent(userId);
+        log.info("绑定用户{} = {}", getSessionId(channel), userId);
     }
 
     public static Integer getUserId(Channel channel) {
@@ -67,12 +73,27 @@ public final class SessionManage {
         return Integer.valueOf(String.valueOf(value));
     }
 
-    public static Channel getChannel(Integer sessionId) {
+    public static Channel getChannelBySessionId(Integer sessionId) {
         return MAP.get(sessionId);
+    }
+
+    public static Channel getChannelByUserId(Integer userId) {
+        if (Objects.isNull(userId)) {
+            return null;
+        }
+        return MAP.values().stream().filter(ch -> userId.equals(getUserId(ch))).findFirst().orElse(null);
     }
 
     public static void broadcast(Object msg) {
         GROUP.writeAndFlush(msg);
+    }
+
+    public static void sendMsg(ChannelHandlerContext ctx, String msg) {
+        ByteBuf byteBuf = ctx.alloc().buffer();
+        byteBuf.writeShort(0);
+        byteBuf.writeBytes(msg.getBytes(StandardCharsets.UTF_8));
+        BinaryWebSocketFrame frame = new BinaryWebSocketFrame(byteBuf);
+        ctx.writeAndFlush(frame);
     }
 
 }
