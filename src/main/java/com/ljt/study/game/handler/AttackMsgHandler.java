@@ -1,7 +1,7 @@
 package com.ljt.study.game.handler;
 
-import com.ljt.study.game.core.Broadcaster;
-import com.ljt.study.game.core.HandlerContext;
+import com.ljt.study.game.core.ChannelManage;
+import com.ljt.study.game.model.HandlerContext;
 import com.ljt.study.game.msg.AttackMsg;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,7 +20,7 @@ public class AttackMsgHandler implements MsgHandler<AttackMsg> {
         newMsg.setTargetUserId(msg.getTargetUserId());
         newMsg.setContent("攻击成功：" + msg.getHp());
 
-        Broadcaster.broadcast(newMsg);
+        ChannelManage.broadcast(newMsg);
     }
 
 }

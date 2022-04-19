@@ -2,6 +2,7 @@ package com.ljt.study.game.core;
 
 import com.alibaba.fastjson.JSON;
 import com.ljt.study.game.enums.MsgTypeEnum;
+import com.ljt.study.game.model.MsgDTO;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;

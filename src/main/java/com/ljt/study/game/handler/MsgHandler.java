@@ -1,6 +1,6 @@
 package com.ljt.study.game.handler;
 
-import com.ljt.study.game.core.HandlerContext;
+import com.ljt.study.game.model.HandlerContext;
 import com.ljt.study.game.msg.BaseMsg;
 
 /**

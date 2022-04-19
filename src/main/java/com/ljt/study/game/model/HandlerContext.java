@@ -1,4 +1,4 @@
-package com.ljt.study.game.core;
+package com.ljt.study.game.model;
 
 import com.ljt.study.game.msg.BaseMsg;
 import io.netty.channel.ChannelFuture;
@@ -12,6 +12,7 @@ public final class HandlerContext {
 
     private final ChannelHandlerContext channelContext;
     private final Integer sessionId;
+    private Integer userId;
 
     public HandlerContext(ChannelHandlerContext channelContext, Integer sessionId) {
         this.channelContext = channelContext;
@@ -24,6 +25,14 @@ public final class HandlerContext {
         dto.setSessionId(sessionId);
 
         return channelContext.writeAndFlush(dto);
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public Integer getUserId() {
+        return userId;
     }
 
 }

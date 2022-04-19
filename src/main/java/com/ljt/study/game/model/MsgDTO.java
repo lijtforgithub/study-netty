@@ -1,4 +1,4 @@
-package com.ljt.study.game.core;
+package com.ljt.study.game.model;
 
 import com.ljt.study.game.msg.BaseMsg;
 import lombok.Data;
@@ -11,6 +11,7 @@ import lombok.Data;
 public class MsgDTO {
 
     private Integer sessionId;
+    private Integer userId;
     private BaseMsg msg;
 
 }

@@ -2,8 +2,11 @@ package com.ljt.study.game.processor;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * @author LiJingTang
@@ -12,7 +15,8 @@ import java.util.concurrent.Executors;
 @Slf4j
 public final class AsyncProcessor {
 
-    private AsyncProcessor() {}
+    private AsyncProcessor() {
+    }
 
     private static final Executor[] EXECUTOR = new Executor[5];
 
@@ -27,15 +31,17 @@ public final class AsyncProcessor {
         }
     }
 
-    public static <T> void process(AsyncOperation<T> supplier) {
+    public static <T> void process(final int bindId, final Supplier<T> supplier, final Consumer<T> consumer) {
         log.info("提交异步任务");
 
-        int i = supplier.getBindId() % EXECUTOR.length;
+        int i = Math.abs(bindId) % EXECUTOR.length;
         Executor executor = EXECUTOR[i];
 
         executor.execute(() -> {
             T t = supplier.get();
-            MainProcessor.process(() -> supplier.accept(t));
+            if (Objects.nonNull(consumer)) {
+                MainProcessor.process(() -> consumer.accept(t));
+            }
         });
     }
 

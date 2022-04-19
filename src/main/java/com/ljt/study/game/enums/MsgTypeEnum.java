@@ -6,6 +6,8 @@ import com.ljt.study.game.msg.LoginMsg;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Objects;
+
 /**
  * @author LiJingTang
  * @date 2022-04-09 22:28
@@ -21,10 +23,19 @@ public enum MsgTypeEnum {
     private final Class<? extends BaseMsg> clazz;
 
     public static Class<? extends BaseMsg> getMsgType(short value) {
+        MsgTypeEnum typeEnum = getEnum(value);
+        if (Objects.nonNull(typeEnum)) {
+            return typeEnum.clazz;
+        }
+
+        return null;
+    }
+
+    public static MsgTypeEnum getEnum(short value) {
         MsgTypeEnum[] values = MsgTypeEnum.values();
         for (MsgTypeEnum typeEnum : values) {
             if (value == typeEnum.getValue()) {
-                return typeEnum.clazz;
+                return typeEnum;
             }
         }
 

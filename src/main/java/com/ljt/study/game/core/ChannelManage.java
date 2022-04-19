@@ -1,5 +1,6 @@
 package com.ljt.study.game.core;
 
+import com.ljt.study.game.model.MsgDTO;
 import com.ljt.study.game.msg.BaseMsg;
 import io.netty.channel.Channel;
 import io.netty.channel.group.ChannelGroup;
@@ -12,9 +13,9 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2022-04-09 22:04
  */
 @Slf4j
-public final class Broadcaster {
+public final class ChannelManage {
 
-    private Broadcaster() {}
+    private ChannelManage() {}
 
     private static final ChannelGroup GROUP = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 

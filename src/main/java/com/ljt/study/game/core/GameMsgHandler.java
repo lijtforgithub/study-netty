@@ -1,5 +1,6 @@
 package com.ljt.study.game.core;
 
+import com.ljt.study.game.model.MsgDTO;
 import com.ljt.study.game.processor.MainProcessor;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -15,13 +16,13 @@ public class GameMsgHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
-        Broadcaster.addChannel(ctx.channel());
+        ChannelManage.addChannel(ctx.channel());
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        Broadcaster.removeChannel(ctx.channel());
+        ChannelManage.removeChannel(ctx.channel());
     }
 
     @Override

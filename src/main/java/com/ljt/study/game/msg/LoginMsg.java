@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 public class LoginMsg extends BaseMsg {
 
     private Integer userId;
+    private String userName;
     private String password;
 
 }

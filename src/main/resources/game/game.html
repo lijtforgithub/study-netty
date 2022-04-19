@@ -7,19 +7,31 @@
 <script>
     // UTF-8 encoding
     const encoder = new TextEncoder();
-    const ws = new WebSocket('ws://localhost:12345');
+    let ws;
+    let userId;
 
-    ws.onmessage = function (event) {
-        const blob = event.data;
-        blob.slice(0, 2).arrayBuffer().then(buffer => {
-            const array = new Uint8Array(buffer);
-            const type = bytesToIntBE(Array.from(array));
-            console.log('消息类型', type);
-        });
-        blob.slice(2, blob.size).text().then(text => {
-            document.getElementById('msg').innerText = text;
-        });
-    };
+    function connect() {
+        ws = new WebSocket('ws://localhost:12345');
+        ws.onopen = function () {
+            document.getElementById('msg').innerText = '连接成功';
+            userId = Math.floor((Math.random() * 1000) + 1);
+        }
+        ws.onclose = function () {
+            document.getElementById('msg').innerText = '连接关闭';
+            userId = 0;
+        }
+        ws.onmessage = function (event) {
+            const blob = event.data;
+            blob.slice(0, 2).arrayBuffer().then(buffer => {
+                const array = new Uint8Array(buffer);
+                const type = bytesToIntBE(Array.from(array));
+                console.log('消息类型', type);
+            });
+            blob.slice(2, blob.size).text().then(text => {
+                document.getElementById('msg').innerText = text;
+            });
+        };
+    }
 
     function send() {
         if (WebSocket.OPEN == ws.readyState) {
@@ -42,7 +54,7 @@
         let obj;
         if (1 == type) {
             obj = {
-                userId: Math.floor((Math.random() * 1000) + 1),
+                userId,
                 password: new Date().getTime(),
                 content: text
             }
@@ -102,5 +114,6 @@
 内容：
 <input type="text" id="text">
 <input type="button" onclick="send()" value=" Send ">
+<input type="button" onclick="connect()" value=" Connect ">
 </body>
 </html>

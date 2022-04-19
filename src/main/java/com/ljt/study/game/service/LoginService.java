@@ -1,9 +1,9 @@
 package com.ljt.study.game.service;
 
-import com.ljt.study.game.processor.AsyncOperation;
+import com.ljt.study.game.model.User;
 import com.ljt.study.game.processor.AsyncProcessor;
-import com.ljt.study.game.msg.LoginMsg;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -24,10 +24,10 @@ public class LoginService {
         return INSTANCE;
     }
 
-    public void login(Integer userId, String password, Consumer<LoginMsg> consumer) {
+    public void login(Integer userId, String password, Consumer<User> consumer) {
         log.info("IO-用户登录：{}", userId);
 
-        Supplier<LoginMsg> supplier = () -> {
+        Supplier<User> supplier = () -> {
             // 查询数据库
             try {
                 TimeUnit.SECONDS.sleep(1);
@@ -35,23 +35,13 @@ public class LoginService {
                 log.error(password);
                 e.printStackTrace();
             }
-            LoginMsg msg = new LoginMsg();
-            msg.setUserId(userId);
-            msg.setContent("登录成功");
-            return msg;
+            User user = new User();
+            user.setId(userId);
+            user.setName(RandomStringUtils.randomAlphabetic(3).toUpperCase());
+            return user;
         };
 
-        AsyncProcessor.process(new AsyncOperation<LoginMsg>() {
-            @Override
-            public LoginMsg get() {
-                return supplier.get();
-            }
-
-            @Override
-            public void accept(LoginMsg loginMsg) {
-                consumer.accept(loginMsg);
-            }
-        });
+        AsyncProcessor.process(userId, supplier, consumer);
     }
 
 }

@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public final class ServiceDiscovery {
 
-    private static final ConcurrentHashMap<String, NettyClient> GROUP = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, NettyClient> MAP = new ConcurrentHashMap<>();
     private static NamingService ns;
 
     private ServiceDiscovery() {
@@ -40,7 +40,7 @@ public final class ServiceDiscovery {
                     NamingEvent nEvent = (NamingEvent) event;
                     List<Instance> instances = nEvent.getInstances();
                     instances.forEach(ServiceDiscovery::connect);
-                    log.info("连接服务器完成：{}", GROUP);
+                    log.info("连接服务器完成：{}", MAP);
                 });
             }
         } catch (Exception e) {
@@ -52,17 +52,17 @@ public final class ServiceDiscovery {
         log.info("开始连接：{} 可用状态：{}", instance.getInstanceId(), instance.isHealthy());
         String serviceId = instance.getInstanceId();
 
-        if (!instance.isHealthy() && GROUP.containsKey(serviceId)) {
+        if (!instance.isHealthy() && MAP.containsKey(serviceId)) {
             return;
         }
 
         try {
             NettyClient client = new NettyClient(serviceId, future -> {
-                GROUP.remove(serviceId);
-                log.info("移除服务器：{} 剩余服务器：{}", serviceId, GROUP);
+                MAP.remove(serviceId);
+                log.info("移除服务器：{} 剩余服务器：{}", serviceId, MAP);
             });
             client.connect(instance.getIp(), instance.getPort());
-            GROUP.put(serviceId, client);
+            MAP.put(serviceId, client);
             log.info("发现服务：{} {}", instance.getServiceName(), instance.getPort());
         } catch (Exception e) {
             log.error("连接服务失败", e);
@@ -78,7 +78,7 @@ public final class ServiceDiscovery {
             Instance instance = ns.selectOneHealthyInstance(PropUtils.getServiceName(), typeEnum.name());
             if (Objects.nonNull(instance)) {
                 log.info("筛选出的服务器：{}", instance.getInstanceId());
-                return GROUP.get(instance.getInstanceId());
+                return MAP.get(instance.getInstanceId());
             }
         } catch (NacosException e) {
             log.error("查询实例异常", e);

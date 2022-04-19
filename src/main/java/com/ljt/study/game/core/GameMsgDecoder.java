@@ -2,6 +2,7 @@ package com.ljt.study.game.core;
 
 import com.alibaba.fastjson.JSON;
 import com.ljt.study.game.enums.MsgTypeEnum;
+import com.ljt.study.game.model.MsgDTO;
 import com.ljt.study.game.msg.BaseMsg;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerAdapter;
@@ -29,7 +30,8 @@ public class GameMsgDecoder extends ChannelHandlerAdapter {
         ByteBuf byteBuf = frame.content();
 
         int sessionId = byteBuf.readInt();
-        log.info("接收sessionId={}", sessionId);
+        int userId = byteBuf.readInt();
+        log.info("接收sessionId={} userId={}", sessionId, userId);
         // 读取消息类型
         short type = byteBuf.readShort();
         Class<? extends BaseMsg> clazz = MsgTypeEnum.getMsgType(type);
@@ -47,6 +49,7 @@ public class GameMsgDecoder extends ChannelHandlerAdapter {
 
         MsgDTO dto = new MsgDTO();
         dto.setSessionId(sessionId);
+        dto.setUserId(userId);
         dto.setMsg(obj);
 
         // 管道向下传递
