@@ -3,8 +3,8 @@ package com.ljt.study.gateway.core;
 import com.ljt.study.game.enums.MsgTypeEnum;
 import com.ljt.study.game.enums.ServiceTypeEnum;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +16,7 @@ import java.util.Optional;
  * @date 2022-04-10 22:13
  */
 @Slf4j
-public class ClientMsgHandler extends ChannelHandlerAdapter {
+public class ClientMsgHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -31,7 +31,7 @@ public class ClientMsgHandler extends ChannelHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void messageReceived(ChannelHandlerContext ctx, Object msg) throws Exception {
         Integer sessionId = SessionManage.getSessionId(ctx.channel());
         if (Objects.isNull(sessionId) || (!(msg instanceof BinaryWebSocketFrame))) {
             super.channelRead(ctx, msg);

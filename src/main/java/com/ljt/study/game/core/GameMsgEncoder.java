@@ -34,7 +34,6 @@ public class GameMsgEncoder extends ChannelHandlerAdapter {
             return;
         }
 
-
         String content = JSON.toJSONString(dto.getMsg());
         ByteBuf byteBuf = ctx.alloc().buffer();
         byteBuf.writeInt(dto.getSessionId());

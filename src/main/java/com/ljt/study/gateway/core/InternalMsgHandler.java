@@ -4,8 +4,8 @@ import com.ljt.study.game.enums.MsgTypeEnum;
 import com.ljt.study.game.util.RedisUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,16 +16,10 @@ import java.util.Objects;
  * @date 2022-04-11 22:13
  */
 @Slf4j
-public class InternalMsgHandler extends ChannelHandlerAdapter {
+public class InternalMsgHandler extends SimpleChannelInboundHandler<BinaryWebSocketFrame> {
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (!(msg instanceof BinaryWebSocketFrame)) {
-            super.channelRead(ctx, msg);
-            return;
-        }
-
-        BinaryWebSocketFrame frame = (BinaryWebSocketFrame) msg;
+    public void messageReceived(ChannelHandlerContext ctx, BinaryWebSocketFrame frame) throws Exception {
         ByteBuf byteBuf = frame.content();
         int sessionId = byteBuf.readInt();
         int userId = byteBuf.readInt();

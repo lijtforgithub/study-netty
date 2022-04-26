@@ -46,7 +46,6 @@ public class GameMsgDecoder extends ChannelHandlerAdapter {
         log.debug("消息：{} => {}", clazz.getSimpleName(), content);
 
         BaseMsg obj = JSON.parseObject(content, clazz);
-
         MsgDTO dto = new MsgDTO();
         dto.setSessionId(sessionId);
         dto.setUserId(userId);

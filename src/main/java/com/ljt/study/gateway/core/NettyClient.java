@@ -33,14 +33,17 @@ import java.util.function.Consumer;
 @Slf4j
 public final class NettyClient {
 
-    private final NioEventLoopGroup WORKER_GROUP = new NioEventLoopGroup(2, r -> {
+    /**
+     * 避免服务器太多 没创建一个client都创建很多线程 线程数不可控制
+     */
+    private static final NioEventLoopGroup WORKER_GROUP = new NioEventLoopGroup(0, r -> {
         Thread t = new Thread(r);
-        t.setName("Netty-Client");
+        t.setName("netty-client");
         return t;
     });
 
     private final String serviceId;
-    private Consumer<Future<?>> closeCallback;
+    private final Consumer<Future<?>> closeCallback;
     private Channel channel;
 
     public String getServiceId() {
