@@ -32,7 +32,7 @@ public class ClientMsgHandler extends SimpleChannelInboundHandler<Object> {
         Integer userId = SessionManage.getUserId(ctx.channel());
         if (Objects.nonNull(userId)) {
             RedisPubSub.compareAndDel(GatewayServer.getId(), userId);
-            log.info("用户下线{}", userId);
+            log.info("用户下线：{}", userId);
         }
 
         SessionManage.remove(ctx.channel());
@@ -69,6 +69,7 @@ public class ClientMsgHandler extends SimpleChannelInboundHandler<Object> {
         NettyClient client = ServiceDiscovery.getClientByType(typeEnum);
         if (Objects.isNull(client)) {
             log.warn("NettyClient为空");
+            SessionManage.sendMsg(ctx, "服务器异常...");
             return;
         }
 

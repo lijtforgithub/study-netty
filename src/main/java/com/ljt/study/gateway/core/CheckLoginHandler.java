@@ -59,6 +59,11 @@ public class CheckLoginHandler extends ChannelHandlerAdapter {
 
             Consumer<Boolean> consumer = b -> {
                 if (Boolean.TRUE.equals(b) && channel.isOpen()) {
+                    try (Jedis jedis = RedisUtils.getJedis()) {
+                        jedis.sadd(GatewayServer.getServerKey(null), String.valueOf(userId));
+                    }
+
+                    SessionManage.setUserId(channel, userId);
                     ctx.fireChannelRead(msg);
                 }
             };
@@ -74,17 +79,11 @@ public class CheckLoginHandler extends ChannelHandlerAdapter {
                 String serverId = RedisUtils.getGatewayId(userId);
                 // redis用户信息里没有登录网关的信息
                 if (StringUtils.isBlank(serverId)) {
-                    boolean flag = RedisUtils.setNxGatewayId(userId, GatewayServer.getId());
-                    if (flag) {
-                        jedis.sadd(GatewayServer.getServerKey(null), String.valueOf(userId));
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return RedisUtils.setNxGatewayId(userId, GatewayServer.getId());
                 }
 
+                // redis用户信息记录登录的就是当前网关
                 if (GatewayServer.getId().equals(serverId)) {
-                    // redis用户信息记录登录的就是当前网关
                     return true;
                 }
 
@@ -99,7 +98,6 @@ public class CheckLoginHandler extends ChannelHandlerAdapter {
 
                 // 服务器宕机 网关的key会删掉 没有续约 但是用户信息里记录的网关ID还在
                 RedisUtils.setGatewayId(userId, GatewayServer.getId());
-                jedis.sadd(GatewayServer.getServerKey(null), String.valueOf(userId));
 
                 return true;
             } catch (Exception e) {

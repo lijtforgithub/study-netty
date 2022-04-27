@@ -36,7 +36,7 @@ public final class SessionManage {
         Integer sessionId = SESSION_ID.getAndIncrement();
         channel.attr(AttributeKey.valueOf(KEY_SESSION_ID)).setIfAbsent(sessionId);
         MAP.put(sessionId, channel);
-        log.info("添加channel {} = {}", channel.id(), sessionId);
+        log.info("添加channel：{} = {}", channel.id(), sessionId);
         return sessionId;
     }
 
@@ -45,7 +45,7 @@ public final class SessionManage {
         Integer sessionId = getSessionId(channel);
         if (Objects.nonNull(sessionId) && MAP.containsKey(sessionId)) {
             MAP.remove(sessionId);
-            log.info("移除channel {} = {}", channel.id(), sessionId);
+            log.info("移除channel：{} = {}", channel.id(), sessionId);
         }
     }
 
@@ -62,7 +62,7 @@ public final class SessionManage {
             return;
         }
         channel.attr(AttributeKey.valueOf(KEY_USER_ID)).setIfAbsent(userId);
-        log.info("绑定用户{} = {}", getSessionId(channel), userId);
+        log.info("绑定用户：{} = {}", getSessionId(channel), userId);
     }
 
     public static Integer getUserId(Channel channel) {

@@ -1,6 +1,5 @@
 package com.ljt.study.gateway.core;
 
-import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingFactory;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.listener.NamingEvent;
@@ -80,7 +79,7 @@ public final class ServiceDiscovery {
                 log.info("筛选出的服务器：{}", instance.getInstanceId());
                 return MAP.get(instance.getInstanceId());
             }
-        } catch (NacosException e) {
+        } catch (Exception e) {
             log.error("查询实例异常", e);
         }
         return null;

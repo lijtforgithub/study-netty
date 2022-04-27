@@ -1,6 +1,5 @@
 package com.ljt.study.gateway.core;
 
-import com.ljt.study.game.enums.MsgTypeEnum;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,7 +18,7 @@ import java.util.Objects;
 public class InternalMsgHandler extends SimpleChannelInboundHandler<BinaryWebSocketFrame> {
 
     @Override
-    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+    public void handlerAdded(ChannelHandlerContext ctx) {
         ChannelPipeline pipeline = ctx.pipeline();
         if (Objects.isNull(pipeline.get(CheckLoginHandler.class))) {
             pipeline.addBefore(ctx.name(), CheckLoginHandler.class.getName(), new CheckLoginHandler());
@@ -30,14 +29,8 @@ public class InternalMsgHandler extends SimpleChannelInboundHandler<BinaryWebSoc
     public void messageReceived(ChannelHandlerContext ctx, BinaryWebSocketFrame frame) throws Exception {
         ByteBuf byteBuf = frame.content();
         int sessionId = byteBuf.readInt();
-        int userId = byteBuf.readInt();
+        byteBuf.readInt();
         short type = byteBuf.readShort();
-        boolean isLoginCmd = MsgTypeEnum.LOGIN == MsgTypeEnum.getEnum(type);
-
-        if (isLoginCmd) {
-            Channel channel = SessionManage.getChannelBySessionId(sessionId);
-            SessionManage.setUserId(channel, userId);
-        }
 
         ByteBuf newByteBuf = ctx.alloc().buffer();
         newByteBuf.writeShort(type);

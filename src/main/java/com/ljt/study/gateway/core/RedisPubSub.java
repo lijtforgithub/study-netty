@@ -32,7 +32,7 @@ public final class RedisPubSub {
         try (Jedis jedis = RedisUtils.getJedis()) {
             LogoutDTO dto = new LogoutDTO(gatewayId, userId);
             jedis.publish(LOGOUT, JSON.toJSONString(dto));
-            log.info("发布登出{}", gatewayId);
+            log.info("发布登出：{}", gatewayId);
         }
     }
 
@@ -45,12 +45,12 @@ public final class RedisPubSub {
         jedis.subscribe(new JedisPubSub() {
             @Override
             public void onMessage(String channel, String message) {
-                log.info("收到订阅消息{} {}", channel, message);
+                log.info("收到订阅消息：{} {}", channel, message);
                 LogoutDTO dto = JSON.parseObject(message, LogoutDTO.class);
                 if (!GatewayServer.getId().equals(dto.getGatewayId())) {
                     return;
                 }
-                log.info("下线用户{}", dto.getUserId());
+                log.info("下线用户：{}", dto.getUserId());
                 Channel ch = SessionManage.getChannelByUserId(dto.getUserId());
                 if (Objects.nonNull(ch)) {
                     try {
