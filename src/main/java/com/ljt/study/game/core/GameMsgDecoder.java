@@ -22,7 +22,6 @@ public class GameMsgDecoder extends ChannelHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (!(msg instanceof BinaryWebSocketFrame)) {
-            super.channelRead(ctx, msg);
             return;
         }
 

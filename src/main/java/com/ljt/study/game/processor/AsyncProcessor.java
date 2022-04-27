@@ -40,7 +40,7 @@ public final class AsyncProcessor {
         executor.execute(() -> {
             T t = supplier.get();
             if (Objects.nonNull(consumer)) {
-                MainProcessor.process(() -> consumer.accept(t));
+                consumer.accept(t);
             }
         });
     }

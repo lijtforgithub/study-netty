@@ -39,7 +39,7 @@ class GameServer {
     private static CommandLine cmdLine;
 
     public static void main(String[] args) throws ParseException {
-        cmdLine = cmdLine(args);
+        initCmdLine(args);
         MsgHandlerFactory.init();
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workGroup = new NioEventLoopGroup();
@@ -82,13 +82,13 @@ class GameServer {
         }
     }
 
-    private static CommandLine cmdLine(String[] args) throws ParseException {
+    private static void initCmdLine(String[] args) throws ParseException {
         Options ops = new Options();
         ops.addOption("h", HOST, true, "主机地址");
         ops.addOption("p", PORT, true, "端口号");
 
         CommandLineParser parser = new DefaultParser();
-        return parser.parse(ops, args);
+        cmdLine = parser.parse(ops, args);
     }
 
     private static int getPort() {

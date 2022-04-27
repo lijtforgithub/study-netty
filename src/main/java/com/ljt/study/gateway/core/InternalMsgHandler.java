@@ -1,10 +1,10 @@
 package com.ljt.study.gateway.core;
 
 import com.ljt.study.game.enums.MsgTypeEnum;
-import com.ljt.study.game.util.RedisUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
@@ -19,25 +19,24 @@ import java.util.Objects;
 public class InternalMsgHandler extends SimpleChannelInboundHandler<BinaryWebSocketFrame> {
 
     @Override
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        ChannelPipeline pipeline = ctx.pipeline();
+        if (Objects.isNull(pipeline.get(CheckLoginHandler.class))) {
+            pipeline.addBefore(ctx.name(), CheckLoginHandler.class.getName(), new CheckLoginHandler());
+        }
+    }
+
+    @Override
     public void messageReceived(ChannelHandlerContext ctx, BinaryWebSocketFrame frame) throws Exception {
         ByteBuf byteBuf = frame.content();
         int sessionId = byteBuf.readInt();
         int userId = byteBuf.readInt();
-        log.info("返回sessionId={} userId={}", sessionId, userId);
-
         short type = byteBuf.readShort();
         boolean isLoginCmd = MsgTypeEnum.LOGIN == MsgTypeEnum.getEnum(type);
 
-        // 在返回的是否判断用户已经登录原因是 有可能是多种方式的登录 请求参数不一样 但是返回消息可以一样
         if (isLoginCmd) {
-            Channel channel = SessionManage.getChannelByUserId(userId);
-            if (Objects.nonNull(channel)) {
-                SessionManage.sendMsg(ctx, "您已经登录：" + RedisUtils.getUser(userId));
-                channel.disconnect().sync();
-            } else {
-                channel = SessionManage.getChannelBySessionId(sessionId);
-                SessionManage.setUserId(channel, userId);
-            }
+            Channel channel = SessionManage.getChannelBySessionId(sessionId);
+            SessionManage.setUserId(channel, userId);
         }
 
         ByteBuf newByteBuf = ctx.alloc().buffer();

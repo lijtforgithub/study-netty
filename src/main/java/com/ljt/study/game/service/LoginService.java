@@ -2,6 +2,7 @@ package com.ljt.study.game.service;
 
 import com.ljt.study.game.model.User;
 import com.ljt.study.game.processor.AsyncProcessor;
+import com.ljt.study.game.processor.MainProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -41,7 +42,8 @@ public class LoginService {
             return user;
         };
 
-        AsyncProcessor.process(userId, supplier, consumer);
+        AsyncProcessor.process(userId, supplier,
+                user -> MainProcessor.process(() -> consumer.accept(user)));
     }
 
 }

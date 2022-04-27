@@ -2,6 +2,7 @@ package com.ljt.study.gateway.core;
 
 import com.ljt.study.game.enums.MsgTypeEnum;
 import com.ljt.study.game.enums.ServiceTypeEnum;
+import com.ljt.study.gateway.GatewayServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -27,6 +28,13 @@ public class ClientMsgHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
+
+        Integer userId = SessionManage.getUserId(ctx.channel());
+        if (Objects.nonNull(userId)) {
+            RedisPubSub.compareAndDel(GatewayServer.getId(), userId);
+            log.info("用户下线{}", userId);
+        }
+
         SessionManage.remove(ctx.channel());
     }
 

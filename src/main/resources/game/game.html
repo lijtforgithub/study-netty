@@ -11,9 +11,11 @@
     let userId;
 
     function connect() {
-        ws = new WebSocket('ws://localhost:12345');
+        const port = getUrlParams('p') || 12345;
+        ws = new WebSocket('ws://localhost:' + port);
         ws.onopen = function () {
             document.getElementById('msg').innerText = '连接成功';
+            console.log(ws);
             const id = document.getElementById('id').value;
             if (id) {
                 userId = id;
@@ -107,6 +109,14 @@
             }
         }
         return val;
+    }
+
+    function getUrlParams(name) {
+        const reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+        const r = window.location.search.substr(1).match(reg);
+        if (r != null)
+            return unescape(r[2]);
+        return null;
     }
 </script>
 <body>
