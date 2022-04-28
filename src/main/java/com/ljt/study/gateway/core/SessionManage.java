@@ -25,6 +25,7 @@ public final class SessionManage {
 
     private static final String KEY_SESSION_ID = "session_id";
     private static final String KEY_USER_ID = "user_id";
+    private static final String KEY_MSG_TYPE = "msg_type";
     private static final AtomicInteger SESSION_ID = new AtomicInteger(1);
     private static final ConcurrentHashMap<Integer, Channel> MAP = new ConcurrentHashMap<>();
     private static final ChannelGroup GROUP = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
@@ -71,6 +72,21 @@ public final class SessionManage {
             return null;
         }
         return Integer.valueOf(String.valueOf(value));
+    }
+
+    public static void setMsgType(Channel channel, short msgType) {
+        if (ObjectUtils.anyNull(channel, msgType)) {
+            return;
+        }
+        channel.attr(AttributeKey.valueOf(KEY_MSG_TYPE)).set(msgType);
+    }
+
+    public static short getMsgType(Channel channel) {
+        Object value = channel.attr(AttributeKey.valueOf(KEY_MSG_TYPE)).get();
+        if (Objects.isNull(value)) {
+            return 0;
+        }
+        return Short.parseShort(String.valueOf(value));
     }
 
     public static Channel getChannelBySessionId(Integer sessionId) {

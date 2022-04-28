@@ -1,11 +1,10 @@
 package com.ljt.study.gateway.core;
 
-import com.ljt.study.game.enums.MsgTypeEnum;
-import com.ljt.study.game.enums.ServiceTypeEnum;
 import com.ljt.study.gateway.GatewayServer;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,7 +16,18 @@ import java.util.Optional;
  * @date 2022-04-10 22:13
  */
 @Slf4j
-public class ClientMsgHandler extends SimpleChannelInboundHandler<Object> {
+public class ClientMsgHandler extends ChannelHandlerAdapter {
+
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) {
+        ChannelPipeline pipeline = ctx.pipeline();
+        if (Objects.isNull(pipeline.get(ValidateUserHandler.class))) {
+            pipeline.addBefore(ctx.name(), ValidateUserHandler.class.getName(), new ValidateUserHandler());
+        }
+        if (Objects.isNull(pipeline.get(RouteHandler.class))) {
+            pipeline.addAfter(ctx.name(), RouteHandler.class.getName(), new RouteHandler());
+        }
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -39,39 +49,17 @@ public class ClientMsgHandler extends SimpleChannelInboundHandler<Object> {
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Integer sessionId = SessionManage.getSessionId(ctx.channel());
-        if (Objects.isNull(sessionId) || (!(msg instanceof BinaryWebSocketFrame))) {
-            super.channelRead(ctx, msg);
-            log.warn("sessionId为空");
+        if (Objects.isNull(sessionId) || !(msg instanceof BinaryWebSocketFrame)) {
+            log.warn("sessionId为空 {}", sessionId);
             return;
         }
 
         BinaryWebSocketFrame frame = (BinaryWebSocketFrame) msg;
         ByteBuf byteBuf = frame.content();
         short type = byteBuf.readShort();
-        boolean isLoginCmd = MsgTypeEnum.LOGIN == MsgTypeEnum.getEnum(type);
         Integer userId = SessionManage.getUserId(ctx.channel());
-
-        if (isLoginCmd) {
-            if (Objects.nonNull(userId)) {
-                SessionManage.sendMsg(ctx, "请勿重复登录");
-                return;
-            }
-        } else {
-            if (Objects.isNull(userId)) {
-                SessionManage.sendMsg(ctx, "请先登录...");
-                return;
-            }
-        }
-
-        ServiceTypeEnum typeEnum = isLoginCmd ? ServiceTypeEnum.LOGIN : ServiceTypeEnum.GAME;
-        NettyClient client = ServiceDiscovery.getClientByType(typeEnum);
-        if (Objects.isNull(client)) {
-            log.warn("NettyClient为空");
-            SessionManage.sendMsg(ctx, "服务器异常...");
-            return;
-        }
 
         ByteBuf newByteBuf = ctx.alloc().buffer();
         newByteBuf.writeInt(sessionId);
@@ -81,7 +69,7 @@ public class ClientMsgHandler extends SimpleChannelInboundHandler<Object> {
 
         // frame.content().copy()
         BinaryWebSocketFrame newFrame = new BinaryWebSocketFrame(newByteBuf);
-        client.sendMsg(newFrame);
+        ctx.fireChannelRead(newFrame);
     }
 
 }

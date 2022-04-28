@@ -26,7 +26,7 @@ public class InternalMsgHandler extends SimpleChannelInboundHandler<BinaryWebSoc
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, BinaryWebSocketFrame frame) throws Exception {
+    public void messageReceived(ChannelHandlerContext ctx, BinaryWebSocketFrame frame) {
         ByteBuf byteBuf = frame.content();
         int sessionId = byteBuf.readInt();
         byteBuf.readInt();
@@ -41,7 +41,7 @@ public class InternalMsgHandler extends SimpleChannelInboundHandler<BinaryWebSoc
             SessionManage.broadcast(newFrame);
         } else {
             Channel channel = SessionManage.getChannelBySessionId(sessionId);
-            if (Objects.nonNull(channel) && channel.isWritable()) {
+            if (Objects.nonNull(channel) && channel.isOpen()) {
                 channel.writeAndFlush(newFrame);
             }
         }

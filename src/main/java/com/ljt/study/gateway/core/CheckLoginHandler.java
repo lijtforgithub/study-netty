@@ -2,6 +2,7 @@ package com.ljt.study.gateway.core;
 
 import com.ljt.study.game.enums.MsgTypeEnum;
 import com.ljt.study.game.processor.AsyncProcessor;
+import com.ljt.study.game.util.DLock;
 import com.ljt.study.game.util.RedisUtils;
 import com.ljt.study.gateway.GatewayServer;
 import io.netty.buffer.ByteBuf;
@@ -27,7 +28,6 @@ public class CheckLoginHandler extends ChannelHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (!(msg instanceof BinaryWebSocketFrame)) {
-            super.channelRead(ctx, msg);
             return;
         }
 
@@ -57,54 +57,74 @@ public class CheckLoginHandler extends ChannelHandlerAdapter {
                 channel.disconnect().sync();
             }
 
-            Consumer<Boolean> consumer = b -> {
-                if (Boolean.TRUE.equals(b) && channel.isOpen()) {
-                    try (Jedis jedis = RedisUtils.getJedis()) {
-                        jedis.sadd(GatewayServer.getServerKey(null), String.valueOf(userId));
-                    }
-
-                    SessionManage.setUserId(channel, userId);
+            Consumer<Void> consumer = b -> {
+                if (channel.isOpen()) {
                     ctx.fireChannelRead(msg);
                 }
             };
 
             // 因为操作Redis也是IO操作 所以放到异步线程池里
-            AsyncProcessor.process(userId, checkSupplier(userId), consumer);
+            AsyncProcessor.process(userId, getSupplier(userId, channel), consumer);
+        } else {
+            ctx.fireChannelRead(msg);
         }
     }
 
-    private Supplier<Boolean> checkSupplier(Integer userId) {
+    private Supplier<Void> getSupplier(int userId, Channel channel) {
         return () -> {
-            try (Jedis jedis = RedisUtils.getJedis()) {
-                String serverId = RedisUtils.getGatewayId(userId);
-                // redis用户信息里没有登录网关的信息
-                if (StringUtils.isBlank(serverId)) {
-                    return RedisUtils.setNxGatewayId(userId, GatewayServer.getId());
+            try (DLock dLock = DLock.tryLockAndGet("dlock:user:login:" + userId, 2000)) {
+                if (null == dLock) {
+                    log.warn("分布式锁加锁失败：userId = {}", userId);
+                    channel.disconnect().sync();
                 }
 
-                // redis用户信息记录登录的就是当前网关
-                if (GatewayServer.getId().equals(serverId)) {
-                    return true;
+                if (checkForRedis(userId)) {
+                    SessionManage.setUserId(channel, userId);
+                    try (Jedis jedis = RedisUtils.getJedis()) {
+                        jedis.sadd(GatewayServer.getServerKey(null), String.valueOf(userId));
+                    }
+                } else {
+                    log.warn("发生重复登录 断开连接：userId = {}", userId);
+                    channel.disconnect().sync();
                 }
-
-                // 判断网关服务记录登录用户是否存在当前用户ID
-                Boolean exist = jedis.sismember(GatewayServer.getServerKey(serverId), String.valueOf(userId));
-                if (Boolean.TRUE.equals(exist)) {
-                    // 发布登出信息 让对应的网关服务器处理
-                    RedisPubSub.pubLogout(serverId, userId);
-                    // 这里返回 false 让自己的网关主动断开 但是当前网关并没有返回登录成功 还要再次登录才可以
-                    return false;
-                }
-
-                // 服务器宕机 网关的key会删掉 没有续约 但是用户信息里记录的网关ID还在
-                RedisUtils.setGatewayId(userId, GatewayServer.getId());
-
-                return true;
             } catch (Exception e) {
-                log.error("校验重复登录", e);
+                log.error(e.getMessage(), e);
+            }
+
+            return null;
+        };
+    }
+
+    private boolean checkForRedis(Integer userId) {
+        try (Jedis jedis = RedisUtils.getJedis()) {
+            String serverId = RedisUtils.getGatewayId(userId);
+            // redis用户信息里没有登录网关的信息
+            if (StringUtils.isBlank(serverId)) {
+                return RedisUtils.setNxGatewayId(userId, GatewayServer.getId());
+            }
+
+            // redis用户信息记录登录的就是当前网关
+            if (GatewayServer.getId().equals(serverId)) {
+                return true;
+            }
+
+            // 判断网关服务记录登录用户是否存在当前用户ID
+            Boolean exist = jedis.sismember(GatewayServer.getServerKey(serverId), String.valueOf(userId));
+            if (Boolean.TRUE.equals(exist)) {
+                // 发布登出信息 让对应的网关服务器处理
+                RedisPubSub.pubLogout(serverId, userId);
+                // 这里返回 false 让自己的网关主动断开 但是当前网关并没有返回登录成功 还要再次登录才可以
                 return false;
             }
-        };
+
+            // 服务器宕机 网关的key会删掉 没有续约 但是用户信息里记录的网关ID还在
+            RedisUtils.setGatewayId(userId, GatewayServer.getId());
+
+            return true;
+        } catch (Exception e) {
+            log.error("校验重复登录", e);
+            return false;
+        }
     }
 
 }

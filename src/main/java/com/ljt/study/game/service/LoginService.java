@@ -31,7 +31,7 @@ public class LoginService {
         Supplier<User> supplier = () -> {
             // 查询数据库
             try {
-                TimeUnit.SECONDS.sleep(1);
+                TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
                 log.error(password);
                 e.printStackTrace();

@@ -85,4 +85,8 @@ public final class ServiceDiscovery {
         return null;
     }
 
+    public static NettyClient getClientById(String instanceId) {
+        return MAP.get(instanceId);
+    }
+
 }
