@@ -18,9 +18,9 @@ public class AttackMsgHandler implements MsgHandler<AttackMsg> {
 
         AttackMsg newMsg = new AttackMsg();
         newMsg.setTargetUserId(msg.getTargetUserId());
-        newMsg.setContent("攻击成功：" + msg.getHp());
+        newMsg.setContent("当前服广播攻击成功：" + msg.getHp());
 
-        ChannelManage.broadcast(newMsg);
+        ChannelManage.broadcastCurrentServer(newMsg);
     }
 
 }

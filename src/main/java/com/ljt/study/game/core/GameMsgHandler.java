@@ -23,12 +23,6 @@ import static com.ljt.study.gateway.core.SessionManage.KEY_GATEWAY_ID;
 public class GameMsgHandler extends SimpleChannelInboundHandler<MsgDTO> {
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        super.channelActive(ctx);
-        ChannelManage.addChannel(ctx.channel());
-    }
-
-    @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
         ChannelManage.removeChannel(ctx.channel());
@@ -54,6 +48,8 @@ public class GameMsgHandler extends SimpleChannelInboundHandler<MsgDTO> {
             log.warn("无法处理消息：{}", dto.getMsg().getClass().getName());
             return;
         }
+
+        ChannelManage.addUser(ctx.channel(), dto.getSessionId(), dto.getUserId());
 
         MainProcessor.process(ctx, dto, handler);
     }

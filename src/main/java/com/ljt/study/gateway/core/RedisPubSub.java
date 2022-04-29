@@ -1,6 +1,7 @@
 package com.ljt.study.gateway.core;
 
 import com.alibaba.fastjson.JSON;
+import com.ljt.study.game.core.ChannelManage;
 import com.ljt.study.game.util.LoadStatistics;
 import com.ljt.study.game.util.RedisUtils;
 import com.ljt.study.gateway.GatewayServer;
@@ -43,7 +44,9 @@ public final class RedisPubSub {
             @Override
             public void onMessage(String channel, String message) {
                 log.info("收到订阅消息：{} {}", channel, message);
-                LoadStatistics.removeUser(Integer.valueOf(message));
+                Integer userId = Integer.valueOf(message);
+                LoadStatistics.removeUser(userId);
+                ChannelManage.removeUser(userId);
             }
         }, OFFER_LINE));
     }
