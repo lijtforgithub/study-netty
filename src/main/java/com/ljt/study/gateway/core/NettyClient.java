@@ -1,5 +1,6 @@
 package com.ljt.study.gateway.core;
 
+import com.ljt.study.gateway.GatewayServer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -25,6 +26,8 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import static com.ljt.study.gateway.core.SessionManage.KEY_GATEWAY_ID;
 
 /**
  * @author LiJingTang
@@ -55,9 +58,10 @@ public final class NettyClient {
         this.closeCallback = closeCallback;
     }
 
-    public void connect(String host, int port) throws Exception {
-        String uri = String.format("ws://%s:%d", host, port);
+    public boolean connect(String host, int port) throws Exception {
+        String uri = String.format("ws://%s:%d/websocket", host, port);
         HttpHeaders httpHeaders = new DefaultHttpHeaders();
+        httpHeaders.add(KEY_GATEWAY_ID, GatewayServer.getId());
         WebSocketClientHandshaker handshake = WebSocketClientHandshakerFactory.newHandshaker(
                 new URI(uri), WebSocketVersion.V13, null, true, httpHeaders);
 
@@ -79,7 +83,7 @@ public final class NettyClient {
         ChannelFuture future = bootstrap.connect(host, port).sync();
         if (!future.isSuccess()) {
             log.warn("连接服务器失败：{}", uri);
-            return;
+            return false;
         }
 
         log.info("连接服务器成功：{}", uri);
@@ -91,7 +95,7 @@ public final class NettyClient {
 
         if (!handshake.isHandshakeComplete()) {
             log.warn("握手失败：{}", uri);
-            return;
+            return false;
         }
 
         log.info("握手成功:{}", uri);
@@ -103,6 +107,8 @@ public final class NettyClient {
                 log.info("回调关闭事件:{}", uri);
             }
         });
+
+        return true;
     }
 
     public void sendMsg(Object msg) {

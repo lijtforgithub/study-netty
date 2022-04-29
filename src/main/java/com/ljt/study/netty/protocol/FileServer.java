@@ -41,7 +41,7 @@ public class FileServer {
     private static class FileServerHandler extends SimpleChannelInboundHandler<String> {
 
         @Override
-        protected void messageReceived(ChannelHandlerContext ctx, String msg) throws Exception {
+        protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
             log.info("服务端接收到到消息：{}", msg);
             File file = new File(msg);
             if (file.exists()) {

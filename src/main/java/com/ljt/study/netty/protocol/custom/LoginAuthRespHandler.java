@@ -1,7 +1,7 @@
 package com.ljt.study.netty.protocol.custom;
 
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
@@ -15,7 +15,7 @@ import java.util.stream.Stream;
  * @date 2020-05-11 11:31
  */
 @Slf4j
-public class LoginAuthRespHandler extends ChannelHandlerAdapter {
+public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
 
     private Map<String, Boolean> nodeCheck = new ConcurrentHashMap<>();
     private String[] whiteList = {"127.0.0.1"};

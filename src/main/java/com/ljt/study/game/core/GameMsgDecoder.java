@@ -5,8 +5,8 @@ import com.ljt.study.game.enums.MsgTypeEnum;
 import com.ljt.study.game.model.MsgDTO;
 import com.ljt.study.game.msg.BaseMsg;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,7 +17,7 @@ import java.util.Objects;
  * @date 2022-04-09 17:47
  */
 @Slf4j
-public class GameMsgDecoder extends ChannelHandlerAdapter {
+public class GameMsgDecoder extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

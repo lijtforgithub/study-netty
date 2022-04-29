@@ -26,7 +26,7 @@ public class InternalMsgHandler extends SimpleChannelInboundHandler<BinaryWebSoc
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, BinaryWebSocketFrame frame) {
+    public void channelRead0(ChannelHandlerContext ctx, BinaryWebSocketFrame frame) {
         ByteBuf byteBuf = frame.content();
         int sessionId = byteBuf.readInt();
         byteBuf.readInt();

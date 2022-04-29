@@ -4,8 +4,8 @@ import com.ljt.study.rpc.protocol.RequestBody;
 import com.ljt.study.rpc.protocol.ResponseBody;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -17,9 +17,9 @@ import java.io.ObjectInputStream;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
 
-import static com.ljt.study.rpc.transport.ClientFactory.createClient;
 import static com.ljt.study.rpc.RpcUtils.serial;
 import static com.ljt.study.rpc.protocol.ProtocolManage.MAX_CONTENT_LENGTH;
+import static com.ljt.study.rpc.transport.ClientFactory.createClient;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 
 /**
@@ -38,7 +38,7 @@ public class NettyHttpTransporter implements Transporter {
             protected void initChannel(NioSocketChannel ch) {
                 ch.pipeline().addLast(new HttpClientCodec())
                         .addLast(new HttpObjectAggregator(MAX_CONTENT_LENGTH))
-                        .addLast(new ChannelHandlerAdapter() {
+                        .addLast(new ChannelInboundHandlerAdapter() {
                             @Override
                             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
                                 FullHttpResponse response = (FullHttpResponse) msg;

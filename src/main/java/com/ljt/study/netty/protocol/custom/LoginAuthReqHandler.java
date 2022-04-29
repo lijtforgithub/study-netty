@@ -1,7 +1,7 @@
 package com.ljt.study.netty.protocol.custom;
 
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
@@ -11,7 +11,7 @@ import java.util.Objects;
  * @date 2020-05-11 11:17
  */
 @Slf4j
-public class LoginAuthReqHandler extends ChannelHandlerAdapter {
+public class LoginAuthReqHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {

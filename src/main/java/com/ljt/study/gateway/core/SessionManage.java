@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public final class SessionManage {
 
+    public static final String KEY_GATEWAY_ID = "X-gateway_id";
     private static final String KEY_SESSION_ID = "session_id";
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_MSG_TYPE = "msg_type";

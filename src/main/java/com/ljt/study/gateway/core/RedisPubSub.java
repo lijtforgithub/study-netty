@@ -1,6 +1,7 @@
 package com.ljt.study.gateway.core;
 
 import com.alibaba.fastjson.JSON;
+import com.ljt.study.game.util.LoadStatistics;
 import com.ljt.study.game.util.RedisUtils;
 import com.ljt.study.gateway.GatewayServer;
 import io.netty.channel.Channel;
@@ -14,6 +15,7 @@ import redis.clients.jedis.JedisPubSub;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 
@@ -25,8 +27,26 @@ import java.util.concurrent.Executors;
 public final class RedisPubSub {
 
     private static final String LOGOUT = "logout";
+    private static final String OFFER_LINE = "offer_line";
 
     private RedisPubSub() {}
+
+    public static void pubOfferLine(Integer userId) {
+        try (Jedis jedis = RedisUtils.getJedis()) {
+            jedis.publish(OFFER_LINE, userId.toString());
+            log.info("发布下线：{}", userId);
+        }
+    }
+
+    public static void subOfferLine() {
+        Executors.newSingleThreadExecutor().submit(() -> RedisUtils.getJedis().subscribe(new JedisPubSub() {
+            @Override
+            public void onMessage(String channel, String message) {
+                log.info("收到订阅消息：{} {}", channel, message);
+                LoadStatistics.removeUser(Integer.valueOf(message));
+            }
+        }, OFFER_LINE));
+    }
 
     public static void pubLogout(String gatewayId, Integer userId) {
         try (Jedis jedis = RedisUtils.getJedis()) {
@@ -36,13 +56,8 @@ public final class RedisPubSub {
         }
     }
 
-    public static void init() {
-        Executors.newSingleThreadExecutor().submit(RedisPubSub::subLogout);
-    }
-
     public static void subLogout() {
-        Jedis jedis = RedisUtils.getJedis();
-        jedis.subscribe(new JedisPubSub() {
+        Executors.newSingleThreadExecutor().submit(() -> RedisUtils.getJedis().subscribe(new JedisPubSub() {
             @Override
             public void onMessage(String channel, String message) {
                 log.info("收到订阅消息：{} {}", channel, message);
@@ -62,13 +77,13 @@ public final class RedisPubSub {
                     compareAndDel(dto.gatewayId, dto.getUserId());
                 }
             }
-        }, LOGOUT);
+        }, LOGOUT));
     }
 
     public static void compareAndDel(String gatewayId, Integer userId) {
         try (Jedis jedis = RedisUtils.getJedis();
              InputStream inputStream = RedisUtils.class.getResourceAsStream("/lua/compareAndDel-gateway.lua")){
-            String script = IOUtils.toString(Objects.requireNonNull(inputStream, "脚本为空"));
+            String script = IOUtils.toString(Objects.requireNonNull(inputStream, "脚本为空"), Charset.defaultCharset());
             jedis.eval(script, 2, userId.toString(), gatewayId);
         } catch (IOException e) {
             e.printStackTrace();

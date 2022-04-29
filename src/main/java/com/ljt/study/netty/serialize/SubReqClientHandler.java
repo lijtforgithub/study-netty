@@ -1,7 +1,7 @@
 package com.ljt.study.netty.serialize;
 
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,7 +12,7 @@ import static com.ljt.study.Constant.LIJT;
  * @date 2020-05-08 16:15
  */
 @Slf4j
-public class SubReqClientHandler extends ChannelHandlerAdapter {
+public class SubReqClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {

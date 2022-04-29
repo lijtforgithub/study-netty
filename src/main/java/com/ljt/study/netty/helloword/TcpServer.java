@@ -3,8 +3,8 @@ package com.ljt.study.netty.helloword;
 import com.ljt.study.netty.Server;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class TcpServer {
     }
 
     @Slf4j
-    private static class TimeServerHandler extends ChannelHandlerAdapter {
+    private static class TimeServerHandler extends ChannelInboundHandlerAdapter {
 
         private int counter;
 

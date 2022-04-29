@@ -7,9 +7,8 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
+import java.time.Duration;
 import java.util.Objects;
-
-import static com.ljt.study.Constant.LOCAL_HOST;
 
 /**
  * @author LiJingTang
@@ -20,21 +19,9 @@ public final class RedisUtils {
     private RedisUtils() {
     }
 
-    private static final JedisPool POOL;
+    private static final JedisPool POOL = new JedisPool();
     private static final String BASE_INFO = "baseInfo";
     private static final String GATEWAY = "gateway";
-
-    static {
-        JedisPoolConfig conf = new JedisPoolConfig();
-        // 最大连接数
-        conf.setMaxTotal(100);
-        // 最大空闲数
-        conf.setMaxIdle(50);
-        // 最大等待毫秒数
-        conf.setMaxWaitMillis(20000);
-        // 创建连接池
-        POOL = new JedisPool(conf, LOCAL_HOST);
-    }
 
     public static Jedis getJedis() {
         return POOL.getResource();

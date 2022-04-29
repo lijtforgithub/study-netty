@@ -2,6 +2,7 @@ package com.ljt.study.game.enums;
 
 import com.ljt.study.game.msg.AttackMsg;
 import com.ljt.study.game.msg.BaseMsg;
+import com.ljt.study.game.msg.EntryMsg;
 import com.ljt.study.game.msg.LoginMsg;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +18,8 @@ import java.util.Objects;
 public enum MsgTypeEnum {
 
     LOGIN(1, LoginMsg.class),
-    ATTACK(2, AttackMsg.class);
+    ENTRY(2, EntryMsg.class),
+    ATTACK(10, AttackMsg.class);
 
     private final int value;
     private final Class<? extends BaseMsg> clazz;

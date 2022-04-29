@@ -47,7 +47,7 @@ public class WebSocketServer {
         private WebSocketServerHandshaker handshaker;
 
         @Override
-        protected void messageReceived(ChannelHandlerContext ctx, Object msg) {
+        protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
             // 传统的 HTTP 接入
             if (msg instanceof FullHttpRequest) {
                 handleHttpRequest(ctx, (FullHttpRequest) msg);

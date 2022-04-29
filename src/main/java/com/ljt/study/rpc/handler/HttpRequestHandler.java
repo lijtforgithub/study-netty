@@ -4,8 +4,8 @@ import com.ljt.study.rpc.protocol.RequestBody;
 import com.ljt.study.rpc.protocol.ResponseBody;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,7 +17,7 @@ import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
  * @date 2021-03-07 14:44
  */
 @Slf4j
-public class HttpRequestHandler extends ChannelHandlerAdapter {
+public class HttpRequestHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

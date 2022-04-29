@@ -1,7 +1,7 @@
 package com.ljt.study.netty.protocol.custom;
 
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.concurrent.ScheduledFuture;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2020-05-11 13:37
  */
 @Slf4j
-public class HeartBeatReqHandler extends ChannelHandlerAdapter {
+public class HeartBeatReqHandler extends ChannelInboundHandlerAdapter {
 
     private volatile ScheduledFuture<?> heartBeat;
 

@@ -9,13 +9,13 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
 
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -23,7 +23,7 @@ import java.util.function.Supplier;
  * @date 2022-04-27 13:28
  */
 @Slf4j
-public class CheckLoginHandler extends ChannelHandlerAdapter {
+public class CheckLoginHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -57,14 +57,13 @@ public class CheckLoginHandler extends ChannelHandlerAdapter {
                 channel.disconnect().sync();
             }
 
-            Consumer<Void> consumer = b -> {
-                if (channel.isOpen()) {
-                    ctx.fireChannelRead(msg);
-                }
-            };
-
             // 因为操作Redis也是IO操作 所以放到异步线程池里
-            AsyncProcessor.process(userId, getSupplier(userId, channel), consumer);
+            AsyncProcessor.process(userId, getSupplier(userId, channel),
+                    b -> ctx.executor().submit(() -> {
+                        if (channel.isOpen()) {
+                            ctx.fireChannelRead(msg);
+                        }
+                    }));
         } else {
             ctx.fireChannelRead(msg);
         }

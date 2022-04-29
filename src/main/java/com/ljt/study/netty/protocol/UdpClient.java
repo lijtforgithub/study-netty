@@ -47,7 +47,7 @@ public class UdpClient {
     private static class ClientHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
         @Override
-        protected void messageReceived(ChannelHandlerContext ctx, DatagramPacket msg) {
+        protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) {
             String response = msg.content().toString(UTF_8);
             log.info(response);
             ctx.close();

@@ -6,8 +6,8 @@ import com.ljt.study.rpc.protocol.RequestBody;
 import com.ljt.study.rpc.protocol.ResponseBody;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.Executor;
@@ -22,7 +22,7 @@ import static com.ljt.study.rpc.RpcUtils.serial;
  * @date 2021-03-06 22:33
  */
 @Slf4j
-public class CustomRequestHandler extends ChannelHandlerAdapter {
+public class CustomRequestHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

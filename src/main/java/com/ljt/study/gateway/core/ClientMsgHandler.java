@@ -1,12 +1,14 @@
 package com.ljt.study.gateway.core;
 
+import com.ljt.study.game.processor.AsyncProcessor;
 import com.ljt.study.gateway.GatewayServer;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -16,7 +18,7 @@ import java.util.Optional;
  * @date 2022-04-10 22:13
  */
 @Slf4j
-public class ClientMsgHandler extends ChannelHandlerAdapter {
+public class ClientMsgHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) {
@@ -39,11 +41,15 @@ public class ClientMsgHandler extends ChannelHandlerAdapter {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
 
-        Integer userId = SessionManage.getUserId(ctx.channel());
-        if (Objects.nonNull(userId)) {
-            RedisPubSub.compareAndDel(GatewayServer.getId(), userId);
-            log.info("用户下线：{}", userId);
-        }
+        AsyncProcessor.process(RandomUtils.nextInt(), () -> {
+            Integer userId = SessionManage.getUserId(ctx.channel());
+            if (Objects.nonNull(userId)) {
+                RedisPubSub.compareAndDel(GatewayServer.getId(), userId);
+                log.info("用户下线：{}", userId);
+                RedisPubSub.pubOfferLine(userId);
+            }
+            return null;
+        }, null);
 
         SessionManage.remove(ctx.channel());
     }

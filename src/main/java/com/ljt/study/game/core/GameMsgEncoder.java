@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.ljt.study.game.enums.MsgTypeEnum;
 import com.ljt.study.game.model.MsgDTO;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
  * @date 2022-04-09 17:46
  */
 @Slf4j
-public class GameMsgEncoder extends ChannelHandlerAdapter {
+public class GameMsgEncoder extends ChannelOutboundHandlerAdapter {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {

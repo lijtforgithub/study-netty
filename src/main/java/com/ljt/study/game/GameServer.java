@@ -3,12 +3,15 @@ package com.ljt.study.game;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingFactory;
 import com.alibaba.nacos.api.naming.NamingService;
+import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.ljt.study.PropUtils;
 import com.ljt.study.game.core.GameMsgDecoder;
 import com.ljt.study.game.core.GameMsgEncoder;
 import com.ljt.study.game.core.GameMsgHandler;
 import com.ljt.study.game.core.MsgHandlerFactory;
 import com.ljt.study.game.enums.ServiceTypeEnum;
+import com.ljt.study.game.util.LoadStatistics;
+import com.ljt.study.gateway.core.RedisPubSub;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -23,6 +26,9 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static com.ljt.study.Constant.DEF_PORT;
 import static com.ljt.study.Constant.LOOP_IP;
@@ -70,6 +76,7 @@ class GameServer {
             if (future.isSuccess()) {
                 log.info("服务启动成功：{} ", port);
                 registerServer(LOOP_IP, port);
+                RedisPubSub.subOfferLine();
             }
 
             future.channel().closeFuture().sync();
@@ -107,8 +114,20 @@ class GameServer {
             String serviceName = PropUtils.getServiceName();
             NamingService ns = NamingFactory.createNamingService(serverAddress);
             String groupName = port > DEF_PORT ? ServiceTypeEnum.GAME.name() : ServiceTypeEnum.LOGIN.name();
-            ns.registerInstance(serviceName, groupName, ip, port);
-            log.info("注册服务{} => {}成功", serviceName, groupName);
+
+            Instance instance = new Instance();
+            instance.setIp(ip);
+            instance.setPort(port);
+
+            Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(() -> {
+                try {
+                    instance.setWeight(LoadStatistics.getWeight());
+                    ns.registerInstance(serviceName, groupName, instance);
+                } catch (NacosException e) {
+                    log.info("注册服务异常", e);
+                }
+            }, 0, 5, TimeUnit.SECONDS);
+
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
                     // 即使下线服务 不然短时间内重启 网关监听不到

@@ -3,11 +3,13 @@ package com.ljt.study.game.model;
 import com.ljt.study.game.msg.BaseMsg;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.Data;
 
 /**
  * @author LiJingTang
  * @date 2022-04-10 11:22
  */
+@Data
 public final class HandlerContext {
 
     private final ChannelHandlerContext channelContext;
@@ -26,10 +28,6 @@ public final class HandlerContext {
         dto.setUserId(userId);
 
         return channelContext.writeAndFlush(dto);
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
     }
 
 }

@@ -12,7 +12,7 @@
 
     function connect() {
         const port = getUrlParams('p') || 12345;
-        ws = new WebSocket('ws://localhost:' + port);
+        ws = new WebSocket(`ws://localhost:${port}/websocket`);
         ws.onopen = function () {
             document.getElementById('msg').innerText = '连接成功';
             console.log(ws);
@@ -33,6 +33,9 @@
                 const array = new Uint8Array(buffer);
                 const type = bytesToIntBE(Array.from(array));
                 console.log('消息类型', type);
+                if (1 === type) {
+                    send(2, '我来了');
+                }
             });
             blob.slice(2, blob.size).text().then(text => {
                 document.getElementById('msg').innerText = text;
@@ -40,14 +43,14 @@
         };
     }
 
-    function send() {
+    function send(_type, _text) {
         if (ws !== undefined && WebSocket.OPEN === ws.readyState) {
-            const text = document.getElementById('text').value;
+            const type = _type || document.getElementById('select').value;
+            const text = _text || document.getElementById('text').value;
             if (!text) {
                 alert('内容为空');
                 return;
             }
-            const type = document.getElementById('select').value;
             const msg = encoder.encode(getMsg(type, text));
             const t = intToBytesBE(type, 2);
 
@@ -59,14 +62,15 @@
     }
 
     function getMsg(type, text) {
+        type = parseInt(type);
         let obj;
-        if (1 == type) {
+        if (1 === type) {
             obj = {
                 userId,
                 password: new Date().getTime(),
                 content: text
             }
-        } else if (2 == type) {
+        } else if (10 === type) {
             obj = {
                 targetUserId: Math.floor((Math.random() * 1000) + 1),
                 hp: Math.floor((Math.random() * 1000) + 1),
@@ -125,7 +129,7 @@
 类型：
 <select id="select">
     <option value="1">Login</option>
-    <option value="2">Attack</option>
+    <option value="10">Attack</option>
 </select>
 用户：<input type="text" id="id"/>
 内容：<input type="text" id="text">

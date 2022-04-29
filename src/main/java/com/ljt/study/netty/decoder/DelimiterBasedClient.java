@@ -3,8 +3,8 @@ package com.ljt.study.netty.decoder;
 import com.ljt.study.netty.Client;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
@@ -34,7 +34,7 @@ public class DelimiterBasedClient {
     }
 
     @Slf4j
-    private static class EchoClientHandler extends ChannelHandlerAdapter {
+    private static class EchoClientHandler extends ChannelInboundHandlerAdapter {
 
         private int counter = 0;
         private final String ECHO_REQ = "Hi, LiJingTang. Welcome to Netty." + DELIMITER;

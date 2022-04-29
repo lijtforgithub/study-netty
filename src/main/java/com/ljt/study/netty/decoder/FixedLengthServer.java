@@ -1,8 +1,8 @@
 package com.ljt.study.netty.decoder;
 
 import com.ljt.study.netty.Server;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.FixedLengthFrameDecoder;
@@ -29,7 +29,7 @@ public class FixedLengthServer {
     }
 
     @Slf4j
-    private static class EchoServerHandler extends ChannelHandlerAdapter {
+    private static class EchoServerHandler extends ChannelInboundHandlerAdapter {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) {

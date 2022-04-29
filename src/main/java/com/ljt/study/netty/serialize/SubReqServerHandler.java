@@ -1,8 +1,8 @@
 package com.ljt.study.netty.serialize;
 
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,7 +14,7 @@ import static com.ljt.study.Constant.LIJT;
  */
 @Slf4j
 @ChannelHandler.Sharable
-public class SubReqServerHandler extends ChannelHandlerAdapter {
+public class SubReqServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {

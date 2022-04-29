@@ -8,6 +8,7 @@ import com.ljt.study.PropUtils;
 import com.ljt.study.game.enums.ServiceTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,10 +49,10 @@ public final class ServiceDiscovery {
     }
 
     private static void connect(Instance instance) {
-        log.info("开始连接：{} 可用状态：{}", instance.getInstanceId(), instance.isHealthy());
+        log.info("{} 可用状态：{}", instance.getInstanceId(), instance.isEnabled());
         String serviceId = instance.getInstanceId();
 
-        if (!instance.isHealthy() && MAP.containsKey(serviceId)) {
+        if (!instance.isEnabled() || MAP.containsKey(serviceId)) {
             return;
         }
 
@@ -60,9 +61,9 @@ public final class ServiceDiscovery {
                 MAP.remove(serviceId);
                 log.info("移除服务器：{} 剩余服务器：{}", serviceId, MAP);
             });
-            client.connect(instance.getIp(), instance.getPort());
-            MAP.put(serviceId, client);
-            log.info("发现服务：{} {}", instance.getServiceName(), instance.getPort());
+            if (client.connect(instance.getIp(), instance.getPort())) {
+                MAP.put(serviceId, client);
+            }
         } catch (Exception e) {
             log.error("连接服务失败", e);
         }
@@ -74,9 +75,9 @@ public final class ServiceDiscovery {
         }
 
         try {
-            Instance instance = ns.selectOneHealthyInstance(PropUtils.getServiceName(), typeEnum.name());
+            Instance instance = ns.selectInstances(PropUtils.getServiceName(), typeEnum.name(), true)
+                    .stream().max(Comparator.comparing(Instance::getWeight)).orElse(null);
             if (Objects.nonNull(instance)) {
-                log.info("筛选出的服务器：{}", instance.getInstanceId());
                 return MAP.get(instance.getInstanceId());
             }
         } catch (Exception e) {

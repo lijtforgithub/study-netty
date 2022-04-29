@@ -71,7 +71,7 @@ public class GatewayServer {
             if (future.isSuccess()) {
                 log.info("服务启动成功：{} ", port);
                 renew();
-                RedisPubSub.init();
+                RedisPubSub.subLogout();
                 ServiceDiscovery.findService();
             }
 

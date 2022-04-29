@@ -48,7 +48,7 @@ class NettyTest {
     @Test
     void client() throws InterruptedException {
         NioEventLoopGroup group = new NioEventLoopGroup();
-        NioSocketChannel client = new NioSocketChannel(group.next());
+        NioSocketChannel client = new NioSocketChannel();
         System.out.println(client.isRegistered());
 
         ChannelFuture future = client.connect(new InetSocketAddress(DEF_PORT)).sync();
