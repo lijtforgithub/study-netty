@@ -1,10 +1,9 @@
-package com.ljt.study.gateway.core;
+package com.ljt.study.game.util;
 
 import com.alibaba.fastjson.JSON;
-import com.ljt.study.game.core.ChannelManage;
-import com.ljt.study.game.util.LoadStatistics;
-import com.ljt.study.game.util.RedisUtils;
+import com.ljt.study.game.core.ChannelUserManage;
 import com.ljt.study.gateway.GatewayServer;
+import com.ljt.study.gateway.core.SessionManage;
 import io.netty.channel.Channel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,8 +44,7 @@ public final class RedisPubSub {
             public void onMessage(String channel, String message) {
                 log.info("收到订阅消息：{} {}", channel, message);
                 Integer userId = Integer.valueOf(message);
-                LoadStatistics.removeUser(userId);
-                ChannelManage.removeUser(userId);
+                ChannelUserManage.removeUser(userId);
             }
         }, OFFER_LINE));
     }

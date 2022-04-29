@@ -1,6 +1,7 @@
 package com.ljt.study.gateway.core;
 
 import com.ljt.study.game.processor.AsyncProcessor;
+import com.ljt.study.game.util.RedisPubSub;
 import com.ljt.study.gateway.GatewayServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

@@ -3,7 +3,6 @@ package com.ljt.study.game.core;
 import com.ljt.study.game.handler.MsgHandler;
 import com.ljt.study.game.model.MsgDTO;
 import com.ljt.study.game.processor.MainProcessor;
-import com.ljt.study.game.util.LoadStatistics;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -25,9 +24,7 @@ public class GameMsgHandler extends SimpleChannelInboundHandler<MsgDTO> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        ChannelManage.removeChannel(ctx.channel());
-        Integer gatewayId = ctx.channel().attr(AttributeKey.<Integer>valueOf(KEY_GATEWAY_ID)).get();
-        LoadStatistics.removeGateway(gatewayId);
+        ChannelUserManage.removeChannel(ctx.channel());
     }
 
     @Override
@@ -49,7 +46,7 @@ public class GameMsgHandler extends SimpleChannelInboundHandler<MsgDTO> {
             return;
         }
 
-        ChannelManage.addUser(ctx.channel(), dto.getSessionId(), dto.getUserId());
+        ChannelUserManage.addUser(ctx.channel(), dto.getSessionId(), dto.getUserId());
 
         MainProcessor.process(ctx, dto, handler);
     }

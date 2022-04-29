@@ -5,13 +5,9 @@ import com.alibaba.nacos.api.naming.NamingFactory;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.ljt.study.PropUtils;
-import com.ljt.study.game.core.GameMsgDecoder;
-import com.ljt.study.game.core.GameMsgEncoder;
-import com.ljt.study.game.core.GameMsgHandler;
-import com.ljt.study.game.core.MsgHandlerFactory;
+import com.ljt.study.game.core.*;
 import com.ljt.study.game.enums.ServiceTypeEnum;
-import com.ljt.study.game.util.LoadStatistics;
-import com.ljt.study.gateway.core.RedisPubSub;
+import com.ljt.study.game.util.RedisPubSub;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -121,7 +117,7 @@ class GameServer {
 
             Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(() -> {
                 try {
-                    instance.setWeight(LoadStatistics.getWeight());
+                    instance.setWeight(2000 - ChannelUserManage.getSize());
                     ns.registerInstance(serviceName, groupName, instance);
                 } catch (NacosException e) {
                     log.info("注册服务异常", e);

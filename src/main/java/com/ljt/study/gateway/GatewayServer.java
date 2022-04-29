@@ -2,7 +2,7 @@ package com.ljt.study.gateway;
 
 import com.ljt.study.game.util.RedisUtils;
 import com.ljt.study.gateway.core.ClientMsgHandler;
-import com.ljt.study.gateway.core.RedisPubSub;
+import com.ljt.study.game.util.RedisPubSub;
 import com.ljt.study.gateway.core.ServiceDiscovery;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;

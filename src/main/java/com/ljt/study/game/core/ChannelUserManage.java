@@ -23,13 +23,17 @@ import static com.ljt.study.gateway.core.SessionManage.KEY_GATEWAY_ID;
  * @date 2022-04-09 22:04
  */
 @Slf4j
-public final class ChannelManage {
+public final class ChannelUserManage {
 
-    private ChannelManage() {
+    private ChannelUserManage() {
     }
 
     private static final Map<Integer, Channel> CHANNEL_MAP = new ConcurrentHashMap<>();
     private static final Set<SessionDTO> SESSION = new ConcurrentHashSet<>();
+
+    public static int getSize() {
+        return SESSION.size();
+    }
 
     public static void broadcastAll(BaseMsg msg) {
         MsgDTO dto = new MsgDTO();
@@ -41,6 +45,7 @@ public final class ChannelManage {
     }
 
     public static void broadcastCurrentServer(BaseMsg msg) {
+        log.info("当前服人数：{}", SESSION.size());
         MsgDTO dto = new MsgDTO();
         dto.setMsg(msg);
 
@@ -67,6 +72,7 @@ public final class ChannelManage {
     public static void removeChannel(Channel channel) {
         Integer gatewayId = channel.attr(AttributeKey.<Integer>valueOf(KEY_GATEWAY_ID)).get();
         CHANNEL_MAP.remove(gatewayId);
+        SESSION.removeIf(dto -> dto.getGatewayId().equals(gatewayId));
         log.info("删除channel {}", gatewayId);
     }
 
