@@ -113,7 +113,9 @@ public final class NettyClient {
 
     public void sendMsg(Object msg) {
         if (ObjectUtils.allNotNull(msg, channel)) {
-            channel.writeAndFlush(msg);
+            ChannelFuture channelFuture = channel.writeAndFlush(msg);
+            channelFuture.addListener(future -> log.info("{} isSuccess={}, isCancellable={}, isCancelled={}, isDone={}",
+                    channelFuture, future.isSuccess(), future.isCancellable(), future.isCancelled(), future.isDone()));
         }
     }
 
