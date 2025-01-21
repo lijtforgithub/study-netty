@@ -21,19 +21,16 @@ public class RpcUtils {
     private RpcUtils() {
     }
 
-    private static final ByteArrayOutputStream BYTE_OUT = new ByteArrayOutputStream();
 
-    public static synchronized byte[] serial(Object obj) {
-        BYTE_OUT.reset();
-        byte[] bytes = null;
-        try {
-            new ObjectOutputStream(BYTE_OUT).writeObject(obj);
-            bytes = BYTE_OUT.toByteArray();
+    public static byte[] serial(Object obj) {
+        try (ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+             ObjectOutputStream outputStream = new ObjectOutputStream(byteOut)) {
+            outputStream.writeObject(obj);
+            return byteOut.toByteArray();
         } catch (IOException e) {
             log.error("序列化异常", e);
+            throw new RuntimeException(e);
         }
-
-        return bytes;
     }
 
     private static Object unSerial(byte[] bytes) {
